@@ -15,8 +15,8 @@ rationale, mathematical concepts, Schwab orchestration plan, and budget guidance
 ## Quick start
 
 ```bash
-python -m pytest
-python -m quant_income_strategy.cli examples/sample_snapshot.json
+PYTHONPATH=src python3 -m unittest
+PYTHONPATH=src python3 -m quant_income_strategy.cli examples/sample_snapshot.json
 ```
 
 The CLI expects normalized option-chain snapshots. In production, populate those

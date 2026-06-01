@@ -88,7 +88,7 @@ class StrategyConfig:
     min_short_delta: float = 0.10
     max_short_delta: float = 0.22
     min_long_delta_gap: float = 0.04
-    max_bid_ask_pct: float = 0.18
+    max_bid_ask_pct: float = 0.20
     min_open_interest: int = 100
     min_credit_to_risk: float = 0.16
     min_iv_rv_ratio: float = 1.12

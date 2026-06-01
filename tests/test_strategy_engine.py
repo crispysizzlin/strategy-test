@@ -1,3 +1,5 @@
+import unittest
+
 from quant_income_strategy import OptionQuote, StrategyConfig, StrategyEngine, UnderlyingSnapshot
 from quant_income_strategy.schwab_orders import (
     build_opening_order,
@@ -5,41 +7,42 @@ from quant_income_strategy.schwab_orders import (
 )
 
 
-def test_engine_selects_defined_risk_candidates() -> None:
-    engine = StrategyEngine(StrategyConfig(account_equity=20_000.0))
+class StrategyEngineTest(unittest.TestCase):
+    def test_engine_selects_defined_risk_candidates(self) -> None:
+        engine = StrategyEngine(StrategyConfig(account_equity=20_000.0))
 
-    trades = engine.find_trades([_sample_snapshot()])
+        trades = engine.find_trades([_sample_snapshot()])
 
-    assert trades
-    assert trades[0].contracts >= 1
-    assert trades[0].risk_dollars <= 20_000.0 * 0.02
-    assert trades[0].max_loss > 0
-    assert trades[0].expected_value > 0
+        self.assertTrue(trades)
+        self.assertGreaterEqual(trades[0].contracts, 1)
+        self.assertLessEqual(trades[0].risk_dollars, 20_000.0 * 0.02)
+        self.assertGreater(trades[0].max_loss, 0)
+        self.assertGreater(trades[0].expected_value, 0)
 
+    def test_schwab_order_payload_uses_multi_leg_net_credit(self) -> None:
+        engine = StrategyEngine(StrategyConfig(account_equity=20_000.0))
+        trade = engine.find_trades([_sample_snapshot()])[0]
 
-def test_schwab_order_payload_uses_multi_leg_net_credit() -> None:
-    engine = StrategyEngine(StrategyConfig(account_equity=20_000.0))
-    trade = engine.find_trades([_sample_snapshot()])[0]
+        order = build_opening_order(trade)
 
-    order = build_opening_order(trade)
+        self.assertEqual(order["orderType"], "NET_CREDIT")
+        self.assertEqual(order["duration"], "DAY")
+        self.assertIn(order["complexOrderStrategyType"], {"VERTICAL", "IRON_CONDOR"})
+        self.assertEqual(len(order["orderLegCollection"]), len(trade.legs))
+        self.assertTrue(
+            all(leg["quantity"] == trade.contracts for leg in order["orderLegCollection"])
+        )
 
-    assert order["orderType"] == "NET_CREDIT"
-    assert order["duration"] == "DAY"
-    assert order["complexOrderStrategyType"] in {"VERTICAL", "IRON_CONDOR"}
-    assert len(order["orderLegCollection"]) == len(trade.legs)
-    assert all(leg["quantity"] == trade.contracts for leg in order["orderLegCollection"])
+    def test_profit_taking_order_closes_opening_instructions(self) -> None:
+        engine = StrategyEngine(StrategyConfig(account_equity=20_000.0))
+        trade = engine.find_trades([_sample_snapshot()])[0]
 
+        close_order = build_profit_taking_close_order(trade, profit_capture=0.50)
+        instructions = {leg["instruction"] for leg in close_order["orderLegCollection"]}
 
-def test_profit_taking_order_closes_opening_instructions() -> None:
-    engine = StrategyEngine(StrategyConfig(account_equity=20_000.0))
-    trade = engine.find_trades([_sample_snapshot()])[0]
-
-    close_order = build_profit_taking_close_order(trade, profit_capture=0.50)
-    instructions = {leg["instruction"] for leg in close_order["orderLegCollection"]}
-
-    assert close_order["orderType"] == "NET_DEBIT"
-    assert "BUY_TO_CLOSE" in instructions
-    assert "SELL_TO_CLOSE" in instructions
+        self.assertEqual(close_order["orderType"], "NET_DEBIT")
+        self.assertIn("BUY_TO_CLOSE", instructions)
+        self.assertIn("SELL_TO_CLOSE", instructions)
 
 
 def _sample_snapshot() -> UnderlyingSnapshot:
@@ -88,3 +91,7 @@ def _quote(
         open_interest=3_000,
         volume=700,
     )
+
+
+if __name__ == "__main__":
+    unittest.main()
