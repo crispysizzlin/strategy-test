@@ -1,0 +1,186 @@
+2026-06-01 04:26:36.546 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=2.34 MaxRisk=0.50 RegimeMult=0.35 SignalScale=0.82 DrawdownScale=1.00 → 1 contracts ($800.00 at risk)
+2026-06-01 04:26:36.546 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=3.10 CVaR=30.00 MaxRisk=4.00 RegimeMult=0.50 SignalScale=0.93 DrawdownScale=1.00 → 3 contracts ($300.00 at risk)
+2026-06-01 04:26:36.547 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=3.75 MaxRisk=0.80 RegimeMult=0.35 SignalScale=0.93 DrawdownScale=1.00 → 1 contracts ($500.00 at risk)
+2026-06-01 04:26:36.547 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=3.75 MaxRisk=0.80 RegimeMult=0.35 SignalScale=0.61 DrawdownScale=1.00 → 1 contracts ($500.00 at risk)
+2026-06-01 04:26:36.548 | WARNING  | src.risk.drawdown_control:130 | Circuit breaker: normal → caution | daily=-700.00 weekly=-700.00 total_dd=-3.50% equity=19300.00
+2026-06-01 04:26:36.549 | WARNING  | src.risk.drawdown_control:130 | Circuit breaker: normal → halt | daily=-4000.00 weekly=-4000.00 total_dd=-20.00% equity=16000.00
+2026-06-01 04:26:36.550 | WARNING  | src.risk.drawdown_control:130 | Circuit breaker: normal → halt | daily=-4000.00 weekly=-4000.00 total_dd=-20.00% equity=16000.00
+2026-06-01 04:26:36.550 | WARNING  | src.risk.drawdown_control:130 | Circuit breaker: normal → caution | daily=-1000.00 weekly=-1000.00 total_dd=-5.00% equity=19000.00
+2026-06-01 04:26:36.550 | INFO     | src.risk.drawdown_control:159 | Daily circuit breaker reset
+2026-06-01 04:26:36.550 | WARNING  | src.risk.drawdown_control:130 | Circuit breaker: normal → caution | daily=-1000.00 weekly=-1000.00 total_dd=-5.00% equity=19000.00
+2026-06-01 04:26:36.551 | WARNING  | src.risk.drawdown_control:130 | Circuit breaker: normal → halt | daily=-3000.00 weekly=-3000.00 total_dd=-15.00% equity=17000.00
+2026-06-01 04:26:36.561 | WARNING  | src.strategy.vrp_engine:329 | Exit signal: Crisis regime detected
+2026-06-01 04:26:36.566 | INFO     | src.strategy.structure_selector:176 | No new positions: regime=RegimeLabel.CRISIS
+2026-06-01 04:32:13.050 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=2.34 MaxRisk=0.50 RegimeMult=0.35 SignalScale=0.82 DrawdownScale=1.00 → 1 contracts ($800.00 at risk)
+2026-06-01 04:32:13.050 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=3.10 CVaR=30.00 MaxRisk=4.00 RegimeMult=0.50 SignalScale=0.93 DrawdownScale=1.00 → 3 contracts ($300.00 at risk)
+2026-06-01 04:32:13.051 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=3.75 MaxRisk=0.80 RegimeMult=0.35 SignalScale=0.93 DrawdownScale=1.00 → 1 contracts ($500.00 at risk)
+2026-06-01 04:32:13.051 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=3.75 MaxRisk=0.80 RegimeMult=0.35 SignalScale=0.61 DrawdownScale=1.00 → 1 contracts ($500.00 at risk)
+2026-06-01 04:32:13.052 | WARNING  | src.risk.drawdown_control:130 | Circuit breaker: normal → caution | daily=-700.00 weekly=-700.00 total_dd=-3.50% equity=19300.00
+2026-06-01 04:32:13.053 | WARNING  | src.risk.drawdown_control:130 | Circuit breaker: normal → halt | daily=-4000.00 weekly=-4000.00 total_dd=-20.00% equity=16000.00
+2026-06-01 04:32:13.054 | WARNING  | src.risk.drawdown_control:130 | Circuit breaker: normal → halt | daily=-4000.00 weekly=-4000.00 total_dd=-20.00% equity=16000.00
+2026-06-01 04:32:13.054 | WARNING  | src.risk.drawdown_control:130 | Circuit breaker: normal → caution | daily=-1000.00 weekly=-1000.00 total_dd=-5.00% equity=19000.00
+2026-06-01 04:32:13.054 | INFO     | src.risk.drawdown_control:159 | Daily circuit breaker reset
+2026-06-01 04:32:13.055 | WARNING  | src.risk.drawdown_control:130 | Circuit breaker: normal → caution | daily=-1000.00 weekly=-1000.00 total_dd=-5.00% equity=19000.00
+2026-06-01 04:32:13.055 | WARNING  | src.risk.drawdown_control:130 | Circuit breaker: normal → halt | daily=-3000.00 weekly=-3000.00 total_dd=-15.00% equity=17000.00
+2026-06-01 04:32:13.065 | WARNING  | src.strategy.vrp_engine:329 | Exit signal: Crisis regime detected
+2026-06-01 04:32:13.069 | INFO     | src.strategy.structure_selector:176 | No new positions: regime=RegimeLabel.CRISIS
+2026-06-01 04:32:51.328 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=2.34 MaxRisk=0.50 RegimeMult=0.35 SignalScale=0.82 DrawdownScale=1.00 → 1 contracts ($800.00 at risk)
+2026-06-01 04:32:51.328 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=3.10 CVaR=30.00 MaxRisk=4.00 RegimeMult=0.50 SignalScale=0.93 DrawdownScale=1.00 → 3 contracts ($300.00 at risk)
+2026-06-01 04:32:51.329 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=3.75 MaxRisk=0.80 RegimeMult=0.35 SignalScale=0.93 DrawdownScale=1.00 → 1 contracts ($500.00 at risk)
+2026-06-01 04:32:51.329 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=3.75 MaxRisk=0.80 RegimeMult=0.35 SignalScale=0.61 DrawdownScale=1.00 → 1 contracts ($500.00 at risk)
+2026-06-01 04:32:51.331 | WARNING  | src.risk.drawdown_control:130 | Circuit breaker: normal → caution | daily=-700.00 weekly=-700.00 total_dd=-3.50% equity=19300.00
+2026-06-01 04:32:51.331 | WARNING  | src.risk.drawdown_control:130 | Circuit breaker: normal → halt | daily=-4000.00 weekly=-4000.00 total_dd=-20.00% equity=16000.00
+2026-06-01 04:32:51.332 | WARNING  | src.risk.drawdown_control:130 | Circuit breaker: normal → halt | daily=-4000.00 weekly=-4000.00 total_dd=-20.00% equity=16000.00
+2026-06-01 04:32:51.333 | WARNING  | src.risk.drawdown_control:130 | Circuit breaker: normal → caution | daily=-1000.00 weekly=-1000.00 total_dd=-5.00% equity=19000.00
+2026-06-01 04:32:51.333 | INFO     | src.risk.drawdown_control:159 | Daily circuit breaker reset
+2026-06-01 04:32:51.334 | WARNING  | src.risk.drawdown_control:130 | Circuit breaker: normal → caution | daily=-1000.00 weekly=-1000.00 total_dd=-5.00% equity=19000.00
+2026-06-01 04:32:51.334 | WARNING  | src.risk.drawdown_control:130 | Circuit breaker: normal → halt | daily=-3000.00 weekly=-3000.00 total_dd=-15.00% equity=17000.00
+2026-06-01 04:32:51.345 | WARNING  | src.strategy.vrp_engine:329 | Exit signal: Crisis regime detected
+2026-06-01 04:32:51.349 | INFO     | src.strategy.structure_selector:176 | No new positions: regime=RegimeLabel.CRISIS
+2026-06-01 04:32:51.352 | INFO     | src.strategy.structure_selector:258 | Structure selected: iron_condor SPY exp=2026-06-03 DTE=2 credit=0.4031 P(P)=74.2% θ=0.2216 Γ=-0.035465  regime=RegimeLabel.LOW_VOL signal=0.75
+2026-06-01 04:33:08.402 | INFO     | backtesting.backtest_engine:252 | Backtest: 2022-12-21 → 2024-11-25 account=$20000
+2026-06-01 04:33:09.543 | INFO     | src.models.regime.hmm_detector:232 | HMM fitted | n_states=3 | log-likelihood=5971.00 | state_labels={0: <RegimeLabel.LOW_VOL: 'low_vol'>, 2: <RegimeLabel.NORMAL_VOL: 'normal_vol'>, 1: <RegimeLabel.HIGH_VOL: 'high_vol'>}
+2026-06-01 04:33:09.684 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.59 MaxRisk=2.50 RegimeMult=0.50 SignalScale=0.73 DrawdownScale=1.00 → 1 contracts ($160.18 at risk)
+2026-06-01 04:33:09.745 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.59 MaxRisk=2.50 RegimeMult=0.50 SignalScale=0.77 DrawdownScale=1.00 → 1 contracts ($160.32 at risk)
+2026-06-01 04:33:10.264 | INFO     | src.models.regime.hmm_detector:232 | HMM fitted | n_states=3 | log-likelihood=9959.11 | state_labels={0: <RegimeLabel.HIGH_VOL: 'high_vol'>, 2: <RegimeLabel.NORMAL_VOL: 'normal_vol'>, 1: <RegimeLabel.LOW_VOL: 'low_vol'>}
+2026-06-01 04:33:11.087 | INFO     | src.models.regime.hmm_detector:232 | HMM fitted | n_states=3 | log-likelihood=3736.82 | state_labels={0: <RegimeLabel.LOW_VOL: 'low_vol'>, 2: <RegimeLabel.NORMAL_VOL: 'normal_vol'>, 1: <RegimeLabel.HIGH_VOL: 'high_vol'>}
+2026-06-01 04:33:11.101 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.60 MaxRisk=2.50 RegimeMult=0.50 SignalScale=0.85 DrawdownScale=1.00 → 1 contracts ($160.47 at risk)
+2026-06-01 04:33:11.143 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.58 MaxRisk=2.50 RegimeMult=0.50 SignalScale=0.75 DrawdownScale=1.00 → 1 contracts ($160.76 at risk)
+2026-06-01 04:33:11.155 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.62 MaxRisk=2.50 RegimeMult=0.50 SignalScale=0.91 DrawdownScale=1.00 → 1 contracts ($160.39 at risk)
+2026-06-01 04:33:11.168 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.58 MaxRisk=2.50 RegimeMult=0.50 SignalScale=0.76 DrawdownScale=1.00 → 1 contracts ($160.79 at risk)
+2026-06-01 04:33:11.193 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.62 MaxRisk=2.50 RegimeMult=0.50 SignalScale=0.76 DrawdownScale=1.00 → 1 contracts ($160.80 at risk)
+2026-06-01 04:33:11.207 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.62 MaxRisk=2.50 RegimeMult=0.50 SignalScale=0.81 DrawdownScale=1.00 → 1 contracts ($160.83 at risk)
+2026-06-01 04:33:11.239 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.62 MaxRisk=2.50 RegimeMult=0.50 SignalScale=0.85 DrawdownScale=1.00 → 1 contracts ($161.07 at risk)
+2026-06-01 04:33:11.255 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.67 MaxRisk=2.51 RegimeMult=0.50 SignalScale=0.98 DrawdownScale=1.00 → 1 contracts ($160.46 at risk)
+2026-06-01 04:33:11.292 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.69 MaxRisk=2.51 RegimeMult=0.50 SignalScale=0.88 DrawdownScale=1.00 → 1 contracts ($160.59 at risk)
+2026-06-01 04:33:11.374 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.71 MaxRisk=2.51 RegimeMult=0.50 SignalScale=0.81 DrawdownScale=1.00 → 1 contracts ($161.17 at risk)
+2026-06-01 04:33:11.386 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.76 MaxRisk=2.52 RegimeMult=0.50 SignalScale=0.87 DrawdownScale=1.00 → 1 contracts ($160.63 at risk)
+2026-06-01 04:33:12.014 | INFO     | src.models.regime.hmm_detector:232 | HMM fitted | n_states=3 | log-likelihood=4009.57 | state_labels={0: <RegimeLabel.HIGH_VOL: 'high_vol'>, 2: <RegimeLabel.NORMAL_VOL: 'normal_vol'>, 1: <RegimeLabel.LOW_VOL: 'low_vol'>}
+2026-06-01 04:33:12.028 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.80 MaxRisk=2.53 RegimeMult=0.50 SignalScale=0.95 DrawdownScale=1.00 → 1 contracts ($160.20 at risk)
+2026-06-01 04:33:12.041 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.84 MaxRisk=2.53 RegimeMult=0.50 SignalScale=0.96 DrawdownScale=1.00 → 1 contracts ($159.83 at risk)
+2026-06-01 04:33:12.055 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.76 MaxRisk=2.52 RegimeMult=0.50 SignalScale=0.83 DrawdownScale=1.00 → 1 contracts ($160.58 at risk)
+2026-06-01 04:33:12.090 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.88 MaxRisk=2.54 RegimeMult=0.50 SignalScale=0.88 DrawdownScale=1.00 → 1 contracts ($160.38 at risk)
+2026-06-01 04:33:12.104 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.95 MaxRisk=2.55 RegimeMult=0.50 SignalScale=0.93 DrawdownScale=1.00 → 1 contracts ($159.69 at risk)
+2026-06-01 04:33:12.117 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.88 MaxRisk=2.54 RegimeMult=0.50 SignalScale=0.87 DrawdownScale=1.00 → 1 contracts ($160.36 at risk)
+2026-06-01 04:33:12.134 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.88 MaxRisk=2.54 RegimeMult=0.50 SignalScale=0.74 DrawdownScale=1.00 → 1 contracts ($160.32 at risk)
+2026-06-01 04:33:12.148 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.89 MaxRisk=2.54 RegimeMult=0.50 SignalScale=0.78 DrawdownScale=1.00 → 1 contracts ($160.19 at risk)
+2026-06-01 04:33:12.164 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.88 MaxRisk=2.54 RegimeMult=0.50 SignalScale=0.72 DrawdownScale=1.00 → 1 contracts ($160.45 at risk)
+2026-06-01 04:33:12.190 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=17.02 MaxRisk=2.56 RegimeMult=0.50 SignalScale=0.83 DrawdownScale=1.00 → 1 contracts ($160.05 at risk)
+2026-06-01 04:33:12.221 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=17.00 MaxRisk=2.56 RegimeMult=0.50 SignalScale=0.73 DrawdownScale=1.00 → 1 contracts ($160.22 at risk)
+2026-06-01 04:33:12.239 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.99 MaxRisk=2.56 RegimeMult=0.50 SignalScale=0.73 DrawdownScale=1.00 → 1 contracts ($160.30 at risk)
+2026-06-01 04:33:12.266 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.99 MaxRisk=2.56 RegimeMult=0.50 SignalScale=0.92 DrawdownScale=1.00 → 1 contracts ($159.80 at risk)
+2026-06-01 04:33:12.279 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.96 MaxRisk=2.55 RegimeMult=0.50 SignalScale=0.83 DrawdownScale=1.00 → 1 contracts ($160.07 at risk)
+2026-06-01 04:33:12.305 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.98 MaxRisk=2.56 RegimeMult=0.50 SignalScale=0.77 DrawdownScale=1.00 → 1 contracts ($160.00 at risk)
+2026-06-01 04:33:12.941 | INFO     | src.models.regime.hmm_detector:232 | HMM fitted | n_states=3 | log-likelihood=10867.55 | state_labels={0: <RegimeLabel.LOW_VOL: 'low_vol'>, 2: <RegimeLabel.NORMAL_VOL: 'normal_vol'>, 1: <RegimeLabel.HIGH_VOL: 'high_vol'>}
+2026-06-01 04:33:12.987 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.99 MaxRisk=2.56 RegimeMult=0.50 SignalScale=0.73 DrawdownScale=1.00 → 1 contracts ($160.41 at risk)
+2026-06-01 04:33:13.031 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.98 MaxRisk=2.56 RegimeMult=0.50 SignalScale=0.77 DrawdownScale=1.00 → 1 contracts ($160.66 at risk)
+2026-06-01 04:33:13.049 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.96 MaxRisk=2.55 RegimeMult=0.50 SignalScale=0.78 DrawdownScale=1.00 → 1 contracts ($160.82 at risk)
+2026-06-01 04:33:13.066 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.95 MaxRisk=2.55 RegimeMult=0.50 SignalScale=0.74 DrawdownScale=1.00 → 1 contracts ($160.93 at risk)
+2026-06-01 04:33:13.104 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.92 MaxRisk=2.55 RegimeMult=0.50 SignalScale=0.86 DrawdownScale=1.00 → 1 contracts ($160.67 at risk)
+2026-06-01 04:33:13.118 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.86 MaxRisk=2.54 RegimeMult=0.50 SignalScale=0.83 DrawdownScale=1.00 → 1 contracts ($161.29 at risk)
+2026-06-01 04:33:13.135 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.90 MaxRisk=2.54 RegimeMult=0.50 SignalScale=0.81 DrawdownScale=1.00 → 1 contracts ($160.88 at risk)
+2026-06-01 04:33:13.159 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.92 MaxRisk=2.55 RegimeMult=0.50 SignalScale=0.79 DrawdownScale=1.00 → 1 contracts ($160.83 at risk)
+2026-06-01 04:33:13.171 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.88 MaxRisk=2.54 RegimeMult=0.50 SignalScale=0.94 DrawdownScale=1.00 → 1 contracts ($160.32 at risk)
+2026-06-01 04:33:13.183 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.84 MaxRisk=2.53 RegimeMult=0.50 SignalScale=0.83 DrawdownScale=1.00 → 1 contracts ($160.67 at risk)
+2026-06-01 04:33:13.206 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.87 MaxRisk=2.54 RegimeMult=0.50 SignalScale=0.87 DrawdownScale=1.00 → 1 contracts ($160.90 at risk)
+2026-06-01 04:33:13.824 | INFO     | src.models.regime.hmm_detector:232 | HMM fitted | n_states=3 | log-likelihood=13299.17 | state_labels={0: <RegimeLabel.LOW_VOL: 'low_vol'>, 2: <RegimeLabel.NORMAL_VOL: 'normal_vol'>, 1: <RegimeLabel.HIGH_VOL: 'high_vol'>}
+2026-06-01 04:33:13.838 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.83 MaxRisk=2.53 RegimeMult=0.50 SignalScale=0.74 DrawdownScale=1.00 → 1 contracts ($161.22 at risk)
+2026-06-01 04:33:13.851 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.85 MaxRisk=2.54 RegimeMult=0.50 SignalScale=0.77 DrawdownScale=1.00 → 1 contracts ($161.10 at risk)
+2026-06-01 04:33:13.864 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.84 MaxRisk=2.53 RegimeMult=0.50 SignalScale=0.73 DrawdownScale=1.00 → 1 contracts ($161.38 at risk)
+2026-06-01 04:33:13.877 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.86 MaxRisk=2.54 RegimeMult=0.50 SignalScale=0.77 DrawdownScale=1.00 → 1 contracts ($161.20 at risk)
+2026-06-01 04:33:13.890 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.97 MaxRisk=2.55 RegimeMult=0.50 SignalScale=0.78 DrawdownScale=1.00 → 1 contracts ($160.86 at risk)
+2026-06-01 04:33:13.956 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.80 MaxRisk=2.53 RegimeMult=0.50 SignalScale=0.92 DrawdownScale=1.00 → 1 contracts ($160.89 at risk)
+2026-06-01 04:33:13.978 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.82 MaxRisk=2.53 RegimeMult=0.50 SignalScale=0.98 DrawdownScale=1.00 → 1 contracts ($160.63 at risk)
+2026-06-01 04:33:13.990 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.78 MaxRisk=2.53 RegimeMult=0.50 SignalScale=0.87 DrawdownScale=1.00 → 1 contracts ($160.98 at risk)
+2026-06-01 04:33:14.011 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.86 MaxRisk=2.54 RegimeMult=0.50 SignalScale=0.98 DrawdownScale=1.00 → 1 contracts ($160.57 at risk)
+2026-06-01 04:33:14.023 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.87 MaxRisk=2.54 RegimeMult=0.50 SignalScale=0.94 DrawdownScale=1.00 → 1 contracts ($160.49 at risk)
+2026-06-01 04:33:14.048 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.65 MaxRisk=2.51 RegimeMult=0.50 SignalScale=0.83 DrawdownScale=1.00 → 1 contracts ($160.57 at risk)
+2026-06-01 04:33:14.080 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.64 MaxRisk=2.50 RegimeMult=0.50 SignalScale=0.75 DrawdownScale=1.00 → 1 contracts ($160.71 at risk)
+2026-06-01 04:33:14.747 | INFO     | src.models.regime.hmm_detector:232 | HMM fitted | n_states=3 | log-likelihood=4918.67 | state_labels={0: <RegimeLabel.LOW_VOL: 'low_vol'>, 2: <RegimeLabel.NORMAL_VOL: 'normal_vol'>, 1: <RegimeLabel.HIGH_VOL: 'high_vol'>}
+2026-06-01 04:33:15.604 | INFO     | src.models.regime.hmm_detector:232 | HMM fitted | n_states=3 | log-likelihood=15223.78 | state_labels={0: <RegimeLabel.LOW_VOL: 'low_vol'>, 2: <RegimeLabel.HIGH_VOL: 'high_vol'>, 1: <RegimeLabel.NORMAL_VOL: 'normal_vol'>}
+2026-06-01 04:33:15.627 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.46 MaxRisk=2.48 RegimeMult=0.50 SignalScale=0.92 DrawdownScale=1.00 → 1 contracts ($159.95 at risk)
+2026-06-01 04:33:15.718 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.47 MaxRisk=2.48 RegimeMult=0.50 SignalScale=0.91 DrawdownScale=1.00 → 1 contracts ($160.00 at risk)
+2026-06-01 04:33:15.799 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.49 MaxRisk=2.48 RegimeMult=0.50 SignalScale=0.96 DrawdownScale=1.00 → 1 contracts ($160.03 at risk)
+2026-06-01 04:33:16.447 | INFO     | src.models.regime.hmm_detector:232 | HMM fitted | n_states=3 | log-likelihood=5513.24 | state_labels={0: <RegimeLabel.NORMAL_VOL: 'normal_vol'>, 2: <RegimeLabel.HIGH_VOL: 'high_vol'>, 1: <RegimeLabel.LOW_VOL: 'low_vol'>}
+2026-06-01 04:33:16.568 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.53 MaxRisk=2.49 RegimeMult=0.50 SignalScale=0.96 DrawdownScale=1.00 → 1 contracts ($159.76 at risk)
+2026-06-01 04:33:16.589 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.51 MaxRisk=2.48 RegimeMult=0.50 SignalScale=0.92 DrawdownScale=1.00 → 1 contracts ($160.02 at risk)
+2026-06-01 04:33:16.654 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.24 MaxRisk=2.44 RegimeMult=0.50 SignalScale=0.86 DrawdownScale=1.00 → 1 contracts ($159.85 at risk)
+2026-06-01 04:33:16.666 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.23 MaxRisk=2.44 RegimeMult=0.50 SignalScale=0.93 DrawdownScale=1.00 → 1 contracts ($159.94 at risk)
+2026-06-01 04:33:17.274 | INFO     | src.models.regime.hmm_detector:232 | HMM fitted | n_states=3 | log-likelihood=5791.83 | state_labels={0: <RegimeLabel.LOW_VOL: 'low_vol'>, 2: <RegimeLabel.NORMAL_VOL: 'normal_vol'>, 1: <RegimeLabel.HIGH_VOL: 'high_vol'>}
+2026-06-01 04:33:17.354 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.08 MaxRisk=2.42 RegimeMult=0.50 SignalScale=0.90 DrawdownScale=1.00 → 1 contracts ($160.59 at risk)
+2026-06-01 04:33:17.365 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.10 MaxRisk=2.42 RegimeMult=0.50 SignalScale=0.97 DrawdownScale=1.00 → 1 contracts ($160.35 at risk)
+2026-06-01 04:33:17.385 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.11 MaxRisk=2.42 RegimeMult=0.50 SignalScale=0.92 DrawdownScale=1.00 → 1 contracts ($160.68 at risk)
+2026-06-01 04:33:17.396 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.11 MaxRisk=2.42 RegimeMult=0.50 SignalScale=0.92 DrawdownScale=1.00 → 1 contracts ($160.66 at risk)
+2026-06-01 04:33:17.408 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.15 MaxRisk=2.43 RegimeMult=0.50 SignalScale=0.98 DrawdownScale=1.00 → 1 contracts ($160.20 at risk)
+2026-06-01 04:33:17.422 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.14 MaxRisk=2.43 RegimeMult=0.50 SignalScale=0.91 DrawdownScale=1.00 → 1 contracts ($160.29 at risk)
+2026-06-01 04:33:17.437 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.13 MaxRisk=2.43 RegimeMult=0.50 SignalScale=0.96 DrawdownScale=1.00 → 1 contracts ($160.36 at risk)
+2026-06-01 04:33:17.451 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.07 MaxRisk=2.42 RegimeMult=0.50 SignalScale=0.82 DrawdownScale=1.00 → 1 contracts ($161.11 at risk)
+2026-06-01 04:33:17.484 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.13 MaxRisk=2.43 RegimeMult=0.50 SignalScale=0.91 DrawdownScale=1.00 → 1 contracts ($160.97 at risk)
+2026-06-01 04:33:17.499 | WARNING  | src.risk.drawdown_control:130 | Circuit breaker: normal → caution | daily=-654.30 weekly=-654.30 total_dd=-5.91% equity=19345.70
+2026-06-01 04:33:17.500 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.04 MaxRisk=2.41 RegimeMult=0.50 SignalScale=0.98 DrawdownScale=0.75 → 1 contracts ($160.29 at risk)
+2026-06-01 04:33:17.516 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=15.98 MaxRisk=2.41 RegimeMult=0.50 SignalScale=0.94 DrawdownScale=0.75 → 1 contracts ($160.01 at risk)
+2026-06-01 04:33:17.531 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=15.97 MaxRisk=2.40 RegimeMult=0.50 SignalScale=0.85 DrawdownScale=0.75 → 1 contracts ($160.39 at risk)
+2026-06-01 04:33:18.153 | INFO     | src.models.regime.hmm_detector:232 | HMM fitted | n_states=3 | log-likelihood=17490.23 | state_labels={0: <RegimeLabel.HIGH_VOL: 'high_vol'>, 2: <RegimeLabel.NORMAL_VOL: 'normal_vol'>, 1: <RegimeLabel.LOW_VOL: 'low_vol'>}
+2026-06-01 04:33:18.174 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=15.96 MaxRisk=2.40 RegimeMult=0.50 SignalScale=0.87 DrawdownScale=0.75 → 1 contracts ($160.57 at risk)
+2026-06-01 04:33:18.196 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=15.96 MaxRisk=2.40 RegimeMult=0.50 SignalScale=0.83 DrawdownScale=0.75 → 1 contracts ($160.62 at risk)
+2026-06-01 04:33:18.232 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=15.99 MaxRisk=2.41 RegimeMult=0.50 SignalScale=0.84 DrawdownScale=0.75 → 1 contracts ($160.87 at risk)
+2026-06-01 04:33:18.246 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.10 MaxRisk=2.42 RegimeMult=0.50 SignalScale=0.97 DrawdownScale=0.75 → 1 contracts ($160.00 at risk)
+2026-06-01 04:33:18.274 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.09 MaxRisk=2.42 RegimeMult=0.50 SignalScale=0.96 DrawdownScale=0.75 → 1 contracts ($160.04 at risk)
+2026-06-01 04:33:18.300 | WARNING  | src.risk.drawdown_control:130 | Circuit breaker: caution → normal | daily=-571.10 weekly=-571.10 total_dd=-5.50% equity=19428.90
+2026-06-01 04:33:18.301 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.12 MaxRisk=2.43 RegimeMult=0.50 SignalScale=0.90 DrawdownScale=1.00 → 1 contracts ($160.20 at risk)
+2026-06-01 04:33:18.340 | WARNING  | src.risk.drawdown_control:130 | Circuit breaker: normal → caution | daily=-688.64 weekly=-688.64 total_dd=-6.07% equity=19311.36
+2026-06-01 04:33:19.120 | INFO     | src.models.regime.hmm_detector:232 | HMM fitted | n_states=3 | log-likelihood=6402.15 | state_labels={0: <RegimeLabel.NORMAL_VOL: 'normal_vol'>, 2: <RegimeLabel.HIGH_VOL: 'high_vol'>, 1: <RegimeLabel.LOW_VOL: 'low_vol'>}
+2026-06-01 04:33:19.960 | INFO     | src.models.regime.hmm_detector:232 | HMM fitted | n_states=3 | log-likelihood=19323.24 | state_labels={0: <RegimeLabel.LOW_VOL: 'low_vol'>, 2: <RegimeLabel.NORMAL_VOL: 'normal_vol'>, 1: <RegimeLabel.HIGH_VOL: 'high_vol'>}
+2026-06-01 04:33:20.025 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=15.94 MaxRisk=2.40 RegimeMult=0.50 SignalScale=0.91 DrawdownScale=0.75 → 1 contracts ($161.04 at risk)
+2026-06-01 04:33:20.089 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.01 MaxRisk=2.41 RegimeMult=0.50 SignalScale=0.98 DrawdownScale=0.75 → 1 contracts ($160.37 at risk)
+2026-06-01 04:33:20.142 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=15.95 MaxRisk=2.40 RegimeMult=0.50 SignalScale=0.94 DrawdownScale=0.75 → 1 contracts ($161.12 at risk)
+2026-06-01 04:33:20.786 | INFO     | src.models.regime.hmm_detector:232 | HMM fitted | n_states=3 | log-likelihood=6983.17 | state_labels={0: <RegimeLabel.HIGH_VOL: 'high_vol'>, 2: <RegimeLabel.NORMAL_VOL: 'normal_vol'>, 1: <RegimeLabel.LOW_VOL: 'low_vol'>}
+2026-06-01 04:33:20.797 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.00 MaxRisk=2.41 RegimeMult=0.50 SignalScale=0.96 DrawdownScale=0.75 → 1 contracts ($160.78 at risk)
+2026-06-01 04:33:20.827 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=15.92 MaxRisk=2.40 RegimeMult=0.50 SignalScale=0.80 DrawdownScale=0.75 → 1 contracts ($161.61 at risk)
+2026-06-01 04:33:20.866 | WARNING  | src.risk.drawdown_control:130 | Circuit breaker: caution → normal | daily=-573.90 weekly=-573.90 total_dd=-5.51% equity=19426.10
+2026-06-01 04:33:20.876 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.06 MaxRisk=2.42 RegimeMult=0.50 SignalScale=0.92 DrawdownScale=1.00 → 1 contracts ($160.71 at risk)
+2026-06-01 04:33:20.916 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=15.95 MaxRisk=2.40 RegimeMult=0.50 SignalScale=0.85 DrawdownScale=1.00 → 1 contracts ($161.80 at risk)
+2026-06-01 04:33:20.929 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=15.92 MaxRisk=2.40 RegimeMult=0.50 SignalScale=0.77 DrawdownScale=1.00 → 1 contracts ($162.09 at risk)
+2026-06-01 04:33:20.942 | WARNING  | src.risk.drawdown_control:130 | Circuit breaker: normal → caution | daily=-770.01 weekly=-770.01 total_dd=-6.47% equity=19229.99
+2026-06-01 04:33:20.944 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=15.79 MaxRisk=2.38 RegimeMult=0.50 SignalScale=0.73 DrawdownScale=0.75 → 1 contracts ($161.85 at risk)
+2026-06-01 04:33:20.959 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=15.78 MaxRisk=2.37 RegimeMult=0.50 SignalScale=0.79 DrawdownScale=0.75 → 1 contracts ($161.96 at risk)
+2026-06-01 04:33:20.973 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=15.81 MaxRisk=2.38 RegimeMult=0.50 SignalScale=0.82 DrawdownScale=0.75 → 1 contracts ($161.73 at risk)
+2026-06-01 04:33:20.987 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=15.89 MaxRisk=2.39 RegimeMult=0.50 SignalScale=0.92 DrawdownScale=0.75 → 1 contracts ($161.09 at risk)
+2026-06-01 04:33:21.000 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=15.88 MaxRisk=2.39 RegimeMult=0.50 SignalScale=0.87 DrawdownScale=0.75 → 1 contracts ($161.56 at risk)
+2026-06-01 04:33:21.027 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=15.93 MaxRisk=2.40 RegimeMult=0.50 SignalScale=0.85 DrawdownScale=0.75 → 1 contracts ($161.03 at risk)
+2026-06-01 04:33:21.042 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=15.93 MaxRisk=2.40 RegimeMult=0.50 SignalScale=0.90 DrawdownScale=0.75 → 1 contracts ($160.97 at risk)
+2026-06-01 04:33:21.663 | INFO     | src.models.regime.hmm_detector:232 | HMM fitted | n_states=3 | log-likelihood=6983.37 | state_labels={0: <RegimeLabel.LOW_VOL: 'low_vol'>, 2: <RegimeLabel.NORMAL_VOL: 'normal_vol'>, 1: <RegimeLabel.HIGH_VOL: 'high_vol'>}
+2026-06-01 04:33:21.681 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=15.87 MaxRisk=2.39 RegimeMult=0.50 SignalScale=0.91 DrawdownScale=0.75 → 1 contracts ($160.25 at risk)
+2026-06-01 04:33:21.707 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=15.83 MaxRisk=2.38 RegimeMult=0.50 SignalScale=0.77 DrawdownScale=0.75 → 1 contracts ($161.78 at risk)
+2026-06-01 04:33:21.729 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=15.84 MaxRisk=2.38 RegimeMult=0.50 SignalScale=0.84 DrawdownScale=0.75 → 1 contracts ($161.61 at risk)
+2026-06-01 04:33:21.752 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=15.93 MaxRisk=2.40 RegimeMult=0.50 SignalScale=0.96 DrawdownScale=0.75 → 1 contracts ($160.86 at risk)
+2026-06-01 04:33:21.802 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=15.90 MaxRisk=2.39 RegimeMult=0.50 SignalScale=0.88 DrawdownScale=0.75 → 1 contracts ($161.62 at risk)
+2026-06-01 04:33:21.824 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=15.86 MaxRisk=2.39 RegimeMult=0.50 SignalScale=0.78 DrawdownScale=0.75 → 1 contracts ($162.11 at risk)
+2026-06-01 04:33:21.844 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=15.89 MaxRisk=2.39 RegimeMult=0.50 SignalScale=0.76 DrawdownScale=0.75 → 1 contracts ($161.99 at risk)
+2026-06-01 04:33:21.856 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=16.01 MaxRisk=2.41 RegimeMult=0.50 SignalScale=0.92 DrawdownScale=0.75 → 1 contracts ($160.70 at risk)
+2026-06-01 04:33:21.869 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=15.94 MaxRisk=2.40 RegimeMult=0.50 SignalScale=0.87 DrawdownScale=0.75 → 1 contracts ($161.45 at risk)
+2026-06-01 04:33:21.883 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=15.84 MaxRisk=2.38 RegimeMult=0.50 SignalScale=0.74 DrawdownScale=0.75 → 1 contracts ($162.44 at risk)
+2026-06-01 04:33:21.897 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=15.92 MaxRisk=2.40 RegimeMult=0.50 SignalScale=0.92 DrawdownScale=0.75 → 1 contracts ($161.65 at risk)
+2026-06-01 04:33:21.912 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=15.94 MaxRisk=2.40 RegimeMult=0.50 SignalScale=0.81 DrawdownScale=0.75 → 1 contracts ($161.71 at risk)
+2026-06-01 04:33:22.528 | INFO     | src.models.regime.hmm_detector:232 | HMM fitted | n_states=3 | log-likelihood=6977.93 | state_labels={0: <RegimeLabel.LOW_VOL: 'low_vol'>, 2: <RegimeLabel.NORMAL_VOL: 'normal_vol'>, 1: <RegimeLabel.HIGH_VOL: 'high_vol'>}
+2026-06-01 04:33:22.542 | INFO     | src.risk.position_sizer:216 | Position sizing: Kelly=0.00 CVaR=15.89 MaxRisk=2.39 RegimeMult=0.50 SignalScale=0.90 DrawdownScale=0.75 → 1 contracts ($161.49 at risk)
+2026-06-01 04:33:22.565 | WARNING  | src.risk.drawdown_control:130 | Circuit breaker: caution → restricted | daily=-1116.22 weekly=-1116.22 total_dd=-8.15% equity=18883.78
+2026-06-01 04:33:23.366 | INFO     | src.models.regime.hmm_detector:232 | HMM fitted | n_states=3 | log-likelihood=6978.23 | state_labels={0: <RegimeLabel.LOW_VOL: 'low_vol'>, 2: <RegimeLabel.NORMAL_VOL: 'normal_vol'>, 1: <RegimeLabel.HIGH_VOL: 'high_vol'>}
+2026-06-01 04:33:24.212 | INFO     | src.models.regime.hmm_detector:232 | HMM fitted | n_states=3 | log-likelihood=6943.96 | state_labels={0: <RegimeLabel.LOW_VOL: 'low_vol'>, 2: <RegimeLabel.HIGH_VOL: 'high_vol'>, 1: <RegimeLabel.NORMAL_VOL: 'normal_vol'>}
+2026-06-01 04:33:25.052 | INFO     | src.models.regime.hmm_detector:232 | HMM fitted | n_states=3 | log-likelihood=6942.57 | state_labels={0: <RegimeLabel.HIGH_VOL: 'high_vol'>, 2: <RegimeLabel.NORMAL_VOL: 'normal_vol'>, 1: <RegimeLabel.LOW_VOL: 'low_vol'>}
+2026-06-01 04:33:25.910 | INFO     | src.models.regime.hmm_detector:232 | HMM fitted | n_states=3 | log-likelihood=6975.19 | state_labels={0: <RegimeLabel.NORMAL_VOL: 'normal_vol'>, 2: <RegimeLabel.LOW_VOL: 'low_vol'>, 1: <RegimeLabel.HIGH_VOL: 'high_vol'>}
+2026-06-01 04:33:26.754 | INFO     | src.models.regime.hmm_detector:232 | HMM fitted | n_states=3 | log-likelihood=6921.52 | state_labels={0: <RegimeLabel.HIGH_VOL: 'high_vol'>, 2: <RegimeLabel.NORMAL_VOL: 'normal_vol'>, 1: <RegimeLabel.LOW_VOL: 'low_vol'>}
+2026-06-01 04:33:27.592 | INFO     | src.models.regime.hmm_detector:232 | HMM fitted | n_states=3 | log-likelihood=7002.07 | state_labels={0: <RegimeLabel.LOW_VOL: 'low_vol'>, 2: <RegimeLabel.HIGH_VOL: 'high_vol'>, 1: <RegimeLabel.NORMAL_VOL: 'normal_vol'>}
+2026-06-01 04:33:28.404 | INFO     | src.models.regime.hmm_detector:232 | HMM fitted | n_states=3 | log-likelihood=12974.44 | state_labels={0: <RegimeLabel.HIGH_VOL: 'high_vol'>, 2: <RegimeLabel.NORMAL_VOL: 'normal_vol'>, 1: <RegimeLabel.LOW_VOL: 'low_vol'>}
+2026-06-01 04:33:29.249 | INFO     | src.models.regime.hmm_detector:232 | HMM fitted | n_states=3 | log-likelihood=7021.04 | state_labels={0: <RegimeLabel.NORMAL_VOL: 'normal_vol'>, 2: <RegimeLabel.LOW_VOL: 'low_vol'>, 1: <RegimeLabel.HIGH_VOL: 'high_vol'>}
+2026-06-01 04:33:29.474 | INFO     | backtesting.backtest_engine:405 | 
+Backtest Results:
+  Trades: 104
+  Win Rate: 79.8%
+  Profit Factor: 0.72
+  Total P&L: $-810.30
+  Ann. Return: -2.7%
+  Sharpe: -0.93
+  Max DD: -8.2%
+  Calmar: -0.34
+  Daily Income: $-1.61

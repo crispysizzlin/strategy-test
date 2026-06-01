@@ -1,0 +1,215 @@
+# ============================================================
+# AVRPE Configuration
+# Adaptive Volatility Regime Premium Engine
+# ============================================================
+
+# --- Broker ---
+broker:
+  api_key: "${SCHWAB_API_KEY}"
+  app_secret: "${SCHWAB_APP_SECRET}"
+  callback_url: "${SCHWAB_CALLBACK_URL}"
+  token_path: "${SCHWAB_TOKEN_PATH}"
+  account_number: "${SCHWAB_ACCOUNT_NUMBER}"
+  paper_mode: false
+
+# --- Account ---
+account:
+  size: 20000
+  supplemental_budget: 600
+  max_margin_usage: 0.50          # never use > 50% of buying power on options
+  cash_reserve_pct: 0.10          # keep 10% in cash buffer
+
+# --- Universe ---
+universe:
+  primary:
+    - symbol: "SPX"
+      type: "index_option"
+      preferred: true             # Section 1256 tax treatment, European exercise
+    - symbol: "SPY"
+      type: "etf_option"
+      preferred: false            # Fallback for tighter strikes
+  supplemental:
+    - "QQQ"
+    - "IWM"
+    - "VIX"
+
+# --- Strategy ---
+strategy:
+  name: "AVRPE"
+  mode: "income"                  # income | directional | hybrid
+
+  # Target portfolio Greeks (daily, per unit of account)
+  target_greeks:
+    theta_daily_min: 40           # Minimum $40/day theta income
+    theta_daily_max: 150          # Cap at $150/day
+    delta_range: [-0.05, 0.05]    # Keep portfolio delta near zero
+    vega_max: -200                # Net short vega (absolute)
+    gamma_max: -0.10              # Portfolio gamma limit
+
+  # Preferred structures per regime
+  structures:
+    low_vol:
+      primary: "iron_condor"
+      secondary: "short_strangle"
+      dte_range: [1, 5]           # 0DTE to 5DTE
+      delta_target: 0.15          # Sell 15-delta strikes
+      wing_width_points: 10       # SPX points per wing
+
+    normal_vol:
+      primary: "iron_condor"
+      secondary: "broken_wing_butterfly"
+      dte_range: [2, 7]
+      delta_target: 0.16
+      wing_width_points: 15
+
+    high_vol:
+      primary: "calendar_spread"
+      secondary: "diagonal_spread"
+      dte_range: [7, 21]
+      delta_target: 0.20
+      wing_width_points: 25
+
+    crisis:
+      primary: "flat"             # No new positions
+      secondary: "defensive_put_spread"
+      dte_range: [21, 45]
+      delta_target: 0.10
+
+# --- Volatility Models ---
+volatility:
+  garch:
+    p: 1
+    q: 1
+    distribution: "normal"       # normal | t | skewt
+    egarch: false
+    lookback_days: 252
+
+  realized_vol:
+    estimators:
+      - "close_to_close"
+      - "parkinson"
+      - "yang_zhang"
+    window: 21
+    annualization_factor: 252
+
+  vrp_signal:
+    lookback: 20                  # days for VRP percentile
+    entry_threshold: 0.60         # 60th percentile of historical VRP
+    exit_threshold: 0.30
+    # VRP = IV - RV; positive = overpriced vol = sell premium
+
+  vol_surface:
+    model: "ssvi"                 # ssvi | svi | cubic_spline
+    calibration_method: "slice_by_slice"
+    arbitrage_check: true
+
+# --- Regime Detection ---
+regime:
+  model: "hmm"
+  n_states: 3
+  features:
+    - "log_returns"
+    - "realized_vol_21d"
+    - "vix_level"
+    - "vix_term_structure_slope"  # VIX3M / VIX ratio
+    - "vrp"
+  refit_frequency: "weekly"       # weekly | daily | monthly
+  lookback_training: 756          # 3 years of daily data
+
+  # State labels (assigned post-fit by sorting on volatility)
+  state_labels:
+    0: "low_vol"                  # State 0: Low volatility / bull
+    1: "normal_vol"               # State 1: Normal / transitional
+    2: "high_vol"                 # State 2: High vol / crisis
+
+  kelly_multipliers:
+    low_vol: 0.50                 # 50% of Kelly (still conservative)
+    normal_vol: 0.35
+    high_vol: 0.15
+    crisis: 0.00                  # No new positions
+
+# --- Risk Management ---
+risk:
+  # Per-trade limits
+  max_trade_risk_pct: 0.02       # 2% of account per trade max loss
+  max_trade_credit_pct: 0.005    # 0.5% of account per trade for credit
+  
+  # Portfolio limits
+  max_portfolio_vega: -1000
+  max_portfolio_delta: 0.05      # As fraction of portfolio value
+  max_open_positions: 6          # Max simultaneous positions
+  max_positions_per_symbol: 2
+
+  # Drawdown protection
+  daily_loss_limit_pct: 0.03     # Stop trading if -3% intraday
+  weekly_loss_limit_pct: 0.05
+  monthly_loss_limit_pct: 0.08
+  max_drawdown_pct: 0.15         # Circuit breaker at 15% drawdown
+
+  # VaR / CVaR
+  var_confidence: 0.95
+  cvar_confidence: 0.95
+  cvar_limit_pct: 0.03           # CVaR limit: 3% of portfolio
+
+  # Kelly criterion
+  kelly_fraction: 0.25            # Full Kelly * 0.25 (conservative)
+  kelly_lookback: 60              # 60 trades for win-rate estimation
+
+# --- Execution ---
+execution:
+  default_order_type: "LIMIT"
+  limit_offset_pct: 0.005        # 0.5% behind mid for passive fill
+  max_slippage_pct: 0.01         # Cancel if slippage > 1%
+  order_timeout_sec: 30          # Cancel unfilled orders after 30s
+  use_level2_timing: true        # Use order flow for entry timing
+
+  # Level 2 analysis
+  level2:
+    imbalance_threshold: 0.60    # 60% bid-side = bearish pressure
+    min_book_depth: 5            # Require 5 levels before trading
+    update_interval_ms: 500      # 500ms refresh
+
+# --- Schedule ---
+schedule:
+  timezone: "America/New_York"
+  market_open: "09:30"
+  market_close: "16:00"
+  
+  # When to scan for new positions
+  entry_windows:
+    - start: "10:00"
+      end: "11:30"
+      label: "morning_prime"
+    - start: "13:00"
+      end: "14:30"
+      label: "afternoon_prime"
+
+  # When to manage / exit
+  management_times:
+    - "10:30"
+    - "12:30"
+    - "15:00"
+    - "15:45"                    # Final management before close
+
+  # Profit targets and stop-losses
+  profit_target_pct: 0.50        # Take profit at 50% of max credit
+  stop_loss_multiplier: 2.0      # Stop at 2x credit received
+
+# --- Data ---
+data:
+  cache_dir: "./data_cache"
+  historical_provider: "schwab"   # schwab | yfinance (fallback)
+  live_provider: "schwab"
+  
+  # Free alternative data sources (within $600 budget)
+  alternative:
+    fred_api_key: "${FRED_API_KEY}"   # Free: Fed data (VIX, rates)
+    polygon_api_key: "${POLYGON_API_KEY}"  # ~$29/mo for options data
+
+# --- Logging ---
+logging:
+  level: "INFO"
+  file: "./logs/avrpe.log"
+  rotation: "daily"
+  retention: "30 days"
+  format: "{time:YYYY-MM-DD HH:mm:ss} | {level} | {name} | {message}"
