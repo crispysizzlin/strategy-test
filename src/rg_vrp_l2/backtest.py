@@ -54,9 +54,9 @@ def run_simple_backtest(
     trades = 0
 
     warmup = 252
+    regime.fit(close.iloc[:warmup])
     for i in range(warmup, len(close) - 21):
         window = close.iloc[: i + 1]
-        regime.fit(window)
         state = regime.predict()
 
         iv30 = float(iv_proxy.iloc[i]) if not np.isnan(iv_proxy.iloc[i]) else 20.0
