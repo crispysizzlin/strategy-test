@@ -1,0 +1,11 @@
+numpy>=1.24.0
+pandas>=2.0.0
+scipy>=1.11.0
+statsmodels>=0.14.0
+pyyaml>=6.0
+python-dotenv>=1.0.0
+yfinance>=0.2.40
+pytest>=7.4.0
+
+# Optional live trading (install when Schwab app approved):
+# schwab-py>=1.5.0

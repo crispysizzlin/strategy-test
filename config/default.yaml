@@ -1,0 +1,66 @@
+account:
+  equity: 20000
+  level: 3
+  broker: schwab
+
+strategy:
+  name: rg-vrp-l2
+  underlyings:
+    - SPY
+    - QQQ
+    - IWM
+  dte_min: 21
+  dte_max: 35
+  short_delta_base: 0.16
+  wing_width_spy: 5
+  wing_width_qqq: 5
+  wing_width_iwm: 3
+  profit_target_pct: 0.50
+  stop_loss_multiple: 2.0
+  max_positions: 3
+  max_loss_per_trade_pct: 0.05
+  max_margin_pct: 0.35
+
+vrp:
+  threshold_vol_points: 2.0
+  iv_rank_min: 0.30
+  rv_lookback_days: 20
+  iv_tenor_days: 30
+
+regime:
+  n_states: 2
+  turbulence_halt: 0.60
+  turbulence_flatten: 0.80
+  half_size_threshold: 0.40
+  training_symbol: SPY
+  lookback_days: 504
+
+inventory:
+  gamma_risk_aversion: 0.25
+  delta_skew_factor: 0.02
+
+l2:
+  max_spread_pct: 0.08
+  obi_min: -0.15
+  obi_max: 0.15
+  min_depth_contracts: 20
+  book_levels: 5
+
+kelly:
+  fraction: 0.25
+  default_win_prob: 0.68
+  max_allocation_pct: 0.12
+
+correlation_proxy:
+  index_symbol: SPY
+  components:
+    - AAPL
+    - MSFT
+    - NVDA
+  wedge_threshold_vol: 1.0
+
+schwab:
+  # Set via environment: SCHWAB_APP_KEY, SCHWAB_APP_SECRET, SCHWAB_CALLBACK_URL
+  token_path: .schwab_token.json
+  rate_limit_market_per_min: 120
+  rate_limit_trade_per_min: 60
