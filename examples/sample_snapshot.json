@@ -1,0 +1,80 @@
+{
+  "snapshots": [
+    {
+      "symbol": "SPY",
+      "price": 450.0,
+      "realized_vol_20d": 0.16,
+      "realized_vol_5d": 0.14,
+      "iv_rank": 0.55,
+      "vix": 18.0,
+      "vix3m": 21.0,
+      "event_risk": false,
+      "options": [
+        {
+          "underlying": "SPY",
+          "option_symbol": "SPY   260717P00430000",
+          "expiration": "2026-07-17",
+          "dte": 46,
+          "option_type": "PUT",
+          "strike": 430.0,
+          "bid": 0.95,
+          "ask": 1.05,
+          "delta": -0.16,
+          "implied_volatility": 0.24,
+          "bid_size": 80,
+          "ask_size": 65,
+          "open_interest": 3000,
+          "volume": 700
+        },
+        {
+          "underlying": "SPY",
+          "option_symbol": "SPY   260717P00428000",
+          "expiration": "2026-07-17",
+          "dte": 46,
+          "option_type": "PUT",
+          "strike": 428.0,
+          "bid": 0.5,
+          "ask": 0.6,
+          "delta": -0.09,
+          "implied_volatility": 0.24,
+          "bid_size": 70,
+          "ask_size": 60,
+          "open_interest": 2500,
+          "volume": 600
+        },
+        {
+          "underlying": "SPY",
+          "option_symbol": "SPY   260717C00470000",
+          "expiration": "2026-07-17",
+          "dte": 46,
+          "option_type": "CALL",
+          "strike": 470.0,
+          "bid": 0.95,
+          "ask": 1.05,
+          "delta": 0.16,
+          "implied_volatility": 0.24,
+          "bid_size": 90,
+          "ask_size": 70,
+          "open_interest": 3200,
+          "volume": 760
+        },
+        {
+          "underlying": "SPY",
+          "option_symbol": "SPY   260717C00472000",
+          "expiration": "2026-07-17",
+          "dte": 46,
+          "option_type": "CALL",
+          "strike": 472.0,
+          "bid": 0.5,
+          "ask": 0.6,
+          "delta": 0.09,
+          "implied_volatility": 0.24,
+          "bid_size": 75,
+          "ask_size": 64,
+          "open_interest": 2600,
+          "volume": 610
+        }
+      ]
+    }
+  ]
+}
