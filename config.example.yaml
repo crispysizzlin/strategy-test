@@ -1,0 +1,44 @@
+account:
+  equity: 20000.0
+  options_level: 3
+  is_margin: true
+  pdt_threshold: 25000.0
+  max_day_trades_per_5d: 3
+risk:
+  max_loss_per_trade_frac: 0.02
+  portfolio_cvar_budget_frac: 0.06
+  max_drawdown_halt_frac: 0.12
+  max_net_delta_per_1k: 1.5
+  max_net_vega_per_1k: 3.0
+  kelly_fraction: 0.25
+  kelly_cap: 0.3
+  take_profit_frac: 0.5
+  stop_loss_mult: 2.0
+signal:
+  min_vrp_var: 0.0
+  min_vrp_zscore: -0.5
+  max_regime_rank_to_harvest: 1
+  backwardation_block: -0.02
+  short_put_delta: 0.16
+  short_call_delta: 0.16
+  wing_width_pct: 0.005
+  target_dte: 35
+  min_dte: 21
+  max_dte: 49
+tail:
+  enabled: true
+  budget_frac_of_credit: 0.2
+  hedge_put_delta: 0.05
+  hedge_dte: 60
+universe:
+  symbols:
+  - XSP
+  - SPY
+  - IWM
+  primary: XSP
+execution:
+  use_level2: true
+  entry_aggressiveness: 0.35
+  max_spread_pct: 0.08
+  contract_multiplier: 100
+mode: backtest
