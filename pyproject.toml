@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "adaptive-orb-research"
+version = "0.1.0"
+description = "Cost-aware research harness for an adaptive ORB/VWAP/order-flow futures strategy"
+requires-python = ">=3.11"
+dependencies = []
+
+[project.scripts]
+adaptive-orb = "adaptive_orb.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "research"}
+
+[tool.setuptools.packages.find]
+where = ["research"]
+

@@ -1,0 +1,12 @@
+__pycache__/
+*.py[cod]
+*.user
+*.suo
+.vs/
+bin/
+obj/
+artifacts/
+*.log
+*.parquet
+*_l2_raw.csv
+

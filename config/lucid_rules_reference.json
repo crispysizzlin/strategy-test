@@ -1,0 +1,23 @@
+{
+  "as_of": "2026-07-20",
+  "source": "https://support.lucidtrading.com/en/",
+  "notes": [
+    "Firm rules can change; verify the dashboard and account agreement before every deployment.",
+    "The strategy's internal limits are intentionally tighter than firm limits.",
+    "Max-loss thresholds cannot be inferred reliably from Quantower Account.Balance; enter the current threshold in the live strategy settings."
+  ],
+  "lucid_pro_evaluation": {
+    "25000": {"profit_target": 1250, "max_loss": 1000, "daily_loss": null, "max_minis": 2, "max_micros": 20},
+    "50000": {"profit_target": 3000, "max_loss": 2000, "daily_loss": 1200, "max_minis": 4, "max_micros": 40},
+    "100000": {"profit_target": 6000, "max_loss": 3000, "daily_loss": 1800, "max_minis": 6, "max_micros": 60},
+    "150000": {"profit_target": 9000, "max_loss": 4500, "daily_loss": 2700, "max_minis": 10, "max_micros": 100}
+  },
+  "commissions_per_side": {"ES": 1.75, "MES": 0.50, "NQ": 1.75, "MNQ": 0.50},
+  "flat_by_eastern": "16:45",
+  "strategy_flat_by_eastern": "15:55",
+  "automation_allowed": true,
+  "hedging_allowed": false,
+  "microscalping_rule": "More than 50% of profits from trades held five seconds or less may be reviewed.",
+  "lucid_pro_payout_consistency_max_best_day_fraction": 0.40
+}
+
