@@ -16,6 +16,15 @@ RAW_FIELDS = {
     "spread_ticks",
 }
 
+# Written by newer recorder builds; passed through when present. Values may be blank
+# on snapshots where no qualifying wall exists.
+OPTIONAL_WALL_FIELDS = (
+    "bid_wall_price",
+    "bid_wall_ratio",
+    "ask_wall_price",
+    "ask_wall_ratio",
+)
+
 
 def aggregate_l2_csv(source: str | Path, destination: str | Path, tail_samples: int = 1) -> int:
     """Reduce the Quantower recorder's throttled snapshots to one close-of-minute row.
@@ -33,6 +42,7 @@ def aggregate_l2_csv(source: str | Path, destination: str | Path, tail_samples: 
         missing = RAW_FIELDS - set(reader.fieldnames)
         if missing:
             raise ValueError(f"L2 CSV is missing columns: {sorted(missing)}")
+        has_walls = all(field in reader.fieldnames for field in OPTIONAL_WALL_FIELDS)
         for line_number, row in enumerate(reader, start=2):
             try:
                 timestamp = datetime.fromisoformat(row["received_utc"].replace("Z", "+00:00"))
@@ -50,20 +60,26 @@ def aggregate_l2_csv(source: str | Path, destination: str | Path, tail_samples: 
                     "l2_persistence": float(row["signed_persistence"]),
                     "spread_ticks": float(row["spread_ticks"]),
                 }
+                walls: dict[str, float | None] = {}
+                if has_walls:
+                    for field in OPTIONAL_WALL_FIELDS:
+                        raw = (row.get(field) or "").strip()
+                        walls[field] = float(raw) if raw else None
             except (TypeError, ValueError) as exc:
                 raise ValueError(f"Invalid L2 data on line {line_number}: {exc}") from exc
-            groups.setdefault(minute, []).append((timestamp, values))
+            groups.setdefault(minute, []).append((timestamp, values, walls))
 
-    fieldnames = [
-        "timestamp",
+    median_fields = [
         "depth_imbalance",
         "ofi_norm",
         "trade_delta_norm",
         "microprice_ticks",
         "l2_persistence",
         "spread_ticks",
-        "l2_age_ms",
     ]
+    fieldnames = ["timestamp", *median_fields, "l2_age_ms"]
+    if has_walls:
+        fieldnames.extend(OPTIONAL_WALL_FIELDS)
     with Path(destination).open("w", encoding="utf-8", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=fieldnames)
         writer.writeheader()
@@ -74,15 +90,18 @@ def aggregate_l2_csv(source: str | Path, destination: str | Path, tail_samples: 
                 0.0,
                 ((minute + timedelta(minutes=1)) - latest_timestamp).total_seconds() * 1000.0,
             )
-            writer.writerow(
-                {
-                    "timestamp": minute.isoformat(),
-                    **{
-                        field: median(row[field] for _, row in tail)
-                        for field in fieldnames
-                        if field not in {"timestamp", "l2_age_ms"}
-                    },
-                    "l2_age_ms": l2_age_ms,
-                }
-            )
+            output_row: dict[str, object] = {
+                "timestamp": minute.isoformat(),
+                **{field: median(row[field] for _, row, _ in tail) for field in median_fields},
+                "l2_age_ms": l2_age_ms,
+            }
+            if has_walls:
+                # Walls are point-in-time price levels; only the final observation of the
+                # minute reflects the book the decision would have seen. Averaging prices
+                # across snapshots with different walls would fabricate levels.
+                latest_walls = tail[-1][2]
+                for field in OPTIONAL_WALL_FIELDS:
+                    value = latest_walls.get(field)
+                    output_row[field] = "" if value is None else value
+            writer.writerow(output_row)
     return len(groups)

@@ -17,6 +17,10 @@ The research engine accepts UTF-8 CSV with one row per one-minute bar. Timestamp
 | `l2_persistence` | when L2 is required | Signed fraction of the most recent five composites having the prevailing sign. |
 | `spread_ticks` | when L2 is required | Best-ask minus best-bid in ticks. |
 | `l2_age_ms` | when L2 is required | Milliseconds from the final eligible book observation to minute end. |
+| `bid_wall_price` | optional | Price of the persistent bid wall visible at minute close; blank when no wall qualified. |
+| `bid_wall_ratio` | optional | Wall size divided by the median displayed bid-level size (must be ≥ 1 when present). |
+| `ask_wall_price` | optional | Price of the persistent ask wall visible at minute close; blank when no wall qualified. |
+| `ask_wall_ratio` | optional | Wall size divided by the median displayed ask-level size (must be ≥ 1 when present). |
 
 `trade_value` must be populated for every bar in a session or omitted from every bar in that session. When omitted, the engine explicitly reports and uses `(high + low + close) / 3 * volume` as an approximation. Locked validation should use real `trade_value`; the approximation is only for a bar-data baseline.
 
@@ -29,8 +33,10 @@ See `examples/minute_bars_schema.csv` for a syntactic example. Its row is illust
 With `RecordLevel2=true`, the strategy writes a throttled snapshot approximately every 200 ms when book updates arrive:
 
 ```text
-received_utc,best_bid,best_ask,best_bid_size,best_ask_size,depth_imbalance,ofi_norm,trade_delta_norm,microprice_ticks,composite,signed_persistence,spread_ticks
+received_utc,best_bid,best_ask,best_bid_size,best_ask_size,depth_imbalance,ofi_norm,trade_delta_norm,microprice_ticks,composite,signed_persistence,spread_ticks,bid_wall_price,bid_wall_ratio,ask_wall_price,ask_wall_ratio
 ```
+
+The four wall columns are blank on snapshots where no level passed both the adaptive size-ratio test and the persistence requirement. The reducer copies the **final** snapshot's wall values into the minute row; wall prices must never be averaged across snapshots because different snapshots can hold different walls.
 
 Reduce it to decision-minute fields with:
 
@@ -51,9 +57,11 @@ Keep the following beside the input even though the minimal loader does not cons
 
 Use a predeclared liquidity roll, such as switching when the next contract's sustained volume exceeds the front contract. Do not choose roll dates after inspecting strategy P&L.
 
-## Daily true range
+## Trading date and daily true range
 
-The Python engine forms true range from completed 09:30–15:55 ET bars and uses the median of the previous 20 sessions. Quantower's provider-defined `DAY1` history may use a different session boundary. For exact reconciliation, calculate the research value from the same RTH data and set `Daily ATR override` in the live strategy.
+Bars are grouped into CME trading dates: an ET timestamp at or after 17:00 belongs to the **next** trading date, so the 18:00 ET Globex reopen opens the following day. Supply full-session bars (including overnight) when GTH windows are enabled; RTH-only data remains valid for RTH-only configurations.
+
+The Python engine forms the daily true range from **all bars in each trading date** (the full Globex day) and uses the median of the previous 20 trading dates. This matches provider-defined `DAY1` futures history used by the live strategy. For exact reconciliation, compute the research median from the same dataset and set `Daily ATR override` in the live strategy if the provider boundary still differs.
 
 ## Optional external regime
 

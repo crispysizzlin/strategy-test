@@ -1,2 +1,2 @@
-timestamp,open,high,low,close,volume,trade_value,depth_imbalance,ofi_norm,trade_delta_norm,microprice_ticks,l2_persistence,spread_ticks,l2_age_ms
-2026-01-02T14:30:00Z,6000.00,6001.00,5999.75,6000.75,1200,7200450.0,0.12,0.08,0.04,0.10,0.55,1.0,200.0
+timestamp,open,high,low,close,volume,trade_value,depth_imbalance,ofi_norm,trade_delta_norm,microprice_ticks,l2_persistence,spread_ticks,l2_age_ms,bid_wall_price,bid_wall_ratio,ask_wall_price,ask_wall_ratio
+2026-01-02T14:30:00Z,23400.00,23404.00,23399.00,23403.00,1200,28083600.0,0.12,0.08,0.04,0.10,0.55,1.0,200.0,23396.00,5.2,,

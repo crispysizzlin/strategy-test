@@ -19,6 +19,10 @@ OPTIONAL_FLOAT_COLUMNS = (
     "l2_persistence",
     "spread_ticks",
     "l2_age_ms",
+    "bid_wall_price",
+    "bid_wall_ratio",
+    "ask_wall_price",
+    "ask_wall_ratio",
 )
 
 
@@ -65,6 +69,14 @@ def load_bars(path: str | Path, assumed_timezone: str = "UTC") -> list[Bar]:
                 raise ValueError(f"Negative trade_value on CSV line {line_number}")
             if bar.l2_age_ms is not None and bar.l2_age_ms < 0:
                 raise ValueError(f"Negative l2_age_ms on CSV line {line_number}")
+            for wall_key in ("bid_wall_price", "ask_wall_price"):
+                wall_value = getattr(bar, wall_key)
+                if wall_value is not None and wall_value <= 0:
+                    raise ValueError(f"Non-positive {wall_key} on CSV line {line_number}")
+            for wall_key in ("bid_wall_ratio", "ask_wall_ratio"):
+                wall_value = getattr(bar, wall_key)
+                if wall_value is not None and wall_value < 1.0:
+                    raise ValueError(f"{wall_key} below 1.0 on CSV line {line_number}")
             bars.append(bar)
 
     bars.sort(key=lambda item: item.timestamp)

@@ -1,0 +1,108 @@
+{
+  "instrument": {
+    "symbol": "MNQ",
+    "tick_size": 0.25,
+    "tick_value": 0.50,
+    "commission_per_side": 0.50,
+    "slippage_ticks_per_side": 1.0
+  },
+  "signal": {
+    "timezone": "America/New_York",
+    "session_open": "09:30",
+    "opening_range_minutes": 15,
+    "signal_end": "11:30",
+    "flatten_time": "15:55",
+    "atr_lookback_sessions": 20,
+    "min_or_atr": 0.08,
+    "max_or_atr": 0.35,
+    "min_or_ticks": 40,
+    "max_or_ticks": 600,
+    "breakout_buffer_fraction": 0.05,
+    "min_breakout_buffer_ticks": 4,
+    "retest_tolerance_fraction": 0.12,
+    "max_retest_bars": 20,
+    "volume_ema_alpha": 0.12,
+    "min_breakout_relative_volume": 1.15,
+    "vwap_slope_bars": 3,
+    "min_vwap_slope_ticks": 2.0,
+    "require_l2": true,
+    "min_l2_composite": 0.15,
+    "min_l2_persistence": 0.60,
+    "max_spread_ticks": 2.0,
+    "max_l2_age_ms": 750.0,
+    "sessions": [
+      {
+        "name": "globex_reopen",
+        "open": "18:00",
+        "opening_range_minutes": 15,
+        "signal_end": "20:00",
+        "flatten": "21:30",
+        "risk_fraction": 0.5,
+        "min_or_atr": 0.02,
+        "max_or_atr": 0.15,
+        "min_or_ticks": 16,
+        "max_or_ticks": 240,
+        "max_spread_ticks": 3.0,
+        "slippage_ticks_per_side": 2.0,
+        "min_breakout_relative_volume": 1.25
+      },
+      {
+        "name": "london_open",
+        "open": "03:00",
+        "opening_range_minutes": 15,
+        "signal_end": "05:00",
+        "flatten": "08:30",
+        "risk_fraction": 0.5,
+        "min_or_atr": 0.02,
+        "max_or_atr": 0.15,
+        "min_or_ticks": 16,
+        "max_or_ticks": 240,
+        "max_spread_ticks": 3.0,
+        "slippage_ticks_per_side": 2.0,
+        "min_breakout_relative_volume": 1.25
+      },
+      {
+        "name": "ny_open",
+        "open": "09:30",
+        "opening_range_minutes": 15,
+        "signal_end": "11:30",
+        "flatten": "15:55",
+        "risk_fraction": 1.0
+      }
+    ]
+  },
+  "execution": {
+    "use_wall_entries": true,
+    "min_wall_ratio": 4.0,
+    "wall_offset_ticks": 6,
+    "wall_stop_pad_ticks": 4,
+    "max_wall_chase_ticks": 24,
+    "wall_entry_timeout_bars": 5,
+    "wall_entry_fallback": "market",
+    "use_round_levels": true,
+    "round_level_front_ticks": 4,
+    "round_level_target_window_ticks": 8,
+    "round_level_stop_trigger_ticks": 4,
+    "round_level_stop_pad_ticks": 6
+  },
+  "risk": {
+    "max_risk_per_trade": 150.0,
+    "max_contracts": 10,
+    "min_stop_ticks": 16,
+    "max_stop_ticks": 240,
+    "structural_stop_fraction": 0.15,
+    "reward_to_risk": 1.75,
+    "time_stop_bars": 45,
+    "failure_close_fraction": 0.15,
+    "max_trades_per_session": 1,
+    "internal_daily_loss_limit": 450.0
+  },
+  "prop": {
+    "enabled": true,
+    "initial_balance": 100000.0,
+    "profit_target": 6000.0,
+    "max_loss": 3000.0,
+    "daily_loss": 1800.0,
+    "locked_floor": 100100.0
+  }
+}

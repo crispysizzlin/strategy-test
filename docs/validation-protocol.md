@@ -17,7 +17,7 @@ Do not repeatedly edit rules after seeing the locked set. A changed rule starts 
 
 ## 2. Required data
 
-Use trade-based MES and, separately, ES data with:
+Use trade-based MNQ and, separately, NQ data (or MES/ES for the legacy profile) with full Globex-session coverage when GTH windows are enabled, including:
 
 - exchange timestamps and unambiguous UTC conversion;
 - bid/ask and actual trade volume;
@@ -45,12 +45,13 @@ Also report event/regime slices: 2020 shock, 2022 inflation/rate volatility, low
 - Decide on bar close, enter at next bar open/first trade.
 - If a minute bar hits stop and target, assume stop first unless tick data resolves order.
 - Charge commission per contract per side.
-- Apply adverse slippage on entry and exit; base case is one MES tick per side, then stress two and four ticks.
+- Apply adverse slippage on entry and exit; base case is one tick per side RTH and two ticks GTH, then stress doubled values.
 - The CLI automatically reports a double-commission/double-slippage run; a four-tick and empirical-tail stress remains required for the final report.
 - Include rejected orders, missed entries, partial fills, disconnects, and stale-book shutdowns in forward testing.
 - Apply the prop max-loss floor to conservative intraday equity, not merely EOD P&L.
 - Compute payout best-day consistency as best positive day divided by **net cumulative profit**, including losing days in the denominator.
-- Do not count a limit order as filled merely because price touched it; the live build currently uses market entry with a server-side bracket to avoid fictional queue priority.
+- Do not count a limit order as filled merely because price touched it. Wall-offset limit entries count as filled only when price trades **strictly through** the limit by at least one tick; queue priority is never assumed. Non-wall entries remain market orders with a server-side bracket.
+- Report results **per window** (Globex reopen, London, NY) in addition to the aggregate, together with the engine's `no_trade_diagnostics_by_window` counters. A window that never trades, or trades only via one gate, must be visible — silently inactive windows are how over-filtered strategies hide.
 
 ## 5. Walk-forward design
 
@@ -63,10 +64,14 @@ The main report must show each window, not only the aggregate. At least 60% of f
 The current numbers are hypotheses. Test small predeclared neighborhoods, not a broad optimizer:
 
 - OR: 5, 15, 30 minutes;
-- OR/ATR bounds: adjacent ±20% values;
+- OR/ATR bounds: adjacent ±20% values (separately for RTH and GTH windows);
 - retest tolerance: 0.08, 0.12, 0.16;
 - L2 threshold: 0.10, 0.15, 0.20;
-- reward/risk: 1.5, 1.75, 2.0.
+- reward/risk: 1.5, 1.75, 2.0;
+- wall offset: 4, 6, 8 ticks; wall ratio: 3, 4, 6; wall timeout: 3, 5, 8 bars;
+- round-number front ticks: 2, 4, 6.
+
+Also run the three ablations `use_wall_entries=false`, `use_round_levels=false`, and GTH windows disabled. Each mechanism must not *degrade* the base strategy net of costs; a mechanism that only helps in one narrow parameter cell is noise and should be switched off rather than tuned.
 
 Require a plateau: neighboring settings should preserve the sign of expectancy. Count every tested combination when estimating backtest-overfitting risk. Do not choose the isolated maximum.
 

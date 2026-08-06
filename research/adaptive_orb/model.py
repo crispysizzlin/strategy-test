@@ -26,6 +26,13 @@ class Bar:
     l2_persistence: float | None = None
     spread_ticks: float | None = None
     l2_age_ms: float | None = None
+    # Persistent resting-liquidity "walls" observed at the close of the minute.
+    # Prices are absolute; ratios are wall size divided by the median displayed
+    # level size on the same side of the book (adaptive, not a fixed contract count).
+    bid_wall_price: float | None = None
+    bid_wall_ratio: float | None = None
+    ask_wall_price: float | None = None
+    ask_wall_ratio: float | None = None
 
     @property
     def has_l2(self) -> bool:
@@ -83,6 +90,8 @@ class Trade:
     opening_range: float
     atr: float | None
     l2_composite: float | None
+    window: str = "primary"
+    entry_type: str = "market"
 
 
 @dataclass(frozen=True)
