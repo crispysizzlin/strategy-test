@@ -25,6 +25,55 @@ class InstrumentConfig:
 
 
 @dataclass(frozen=True)
+class SessionWindowConfig:
+    """One intraday trading window (a clock interval that must not cross midnight).
+
+    Optional fields fall back to the global signal/instrument values. GTH windows
+    typically carry a reduced ``risk_fraction``, wider spread/slippage assumptions,
+    and their own opening-range bounds because overnight ranges are structurally
+    smaller relative to the daily ATR.
+    """
+
+    name: str
+    open: str
+    opening_range_minutes: int
+    signal_end: str
+    flatten: str
+    risk_fraction: float = 1.0
+    min_or_atr: float | None = None
+    max_or_atr: float | None = None
+    min_or_ticks: int | None = None
+    max_or_ticks: int | None = None
+    max_spread_ticks: float | None = None
+    slippage_ticks_per_side: float | None = None
+    min_breakout_relative_volume: float | None = None
+
+
+@dataclass(frozen=True)
+class ExecutionConfig:
+    """Execution-price modifiers. These adjust prices; they never veto a signal.
+
+    Wall entries queue a passive limit ``wall_offset_ticks`` in front of a large,
+    persistent resting order instead of paying the spread at market. If the limit
+    is not filled within ``wall_entry_timeout_bars``, the configured fallback
+    (default: market) keeps the base strategy's trade frequency intact.
+    """
+
+    use_wall_entries: bool = True
+    min_wall_ratio: float = 4.0
+    wall_offset_ticks: int = 6
+    wall_stop_pad_ticks: int = 4
+    max_wall_chase_ticks: int = 24
+    wall_entry_timeout_bars: int = 5
+    wall_entry_fallback: str = "market"
+    use_round_levels: bool = True
+    round_level_front_ticks: int = 4
+    round_level_target_window_ticks: int = 8
+    round_level_stop_trigger_ticks: int = 4
+    round_level_stop_pad_ticks: int = 6
+
+
+@dataclass(frozen=True)
 class SignalConfig:
     timezone: str = "America/New_York"
     session_open: str = "09:30"
@@ -49,6 +98,22 @@ class SignalConfig:
     min_l2_persistence: float = 0.60
     max_spread_ticks: float = 1.0
     max_l2_age_ms: float = 750.0
+    sessions: tuple[SessionWindowConfig, ...] = ()
+
+    def resolved_sessions(self) -> tuple[SessionWindowConfig, ...]:
+        """Explicit windows, or a single legacy window built from the flat fields."""
+
+        if self.sessions:
+            return self.sessions
+        return (
+            SessionWindowConfig(
+                name="primary",
+                open=self.session_open,
+                opening_range_minutes=self.opening_range_minutes,
+                signal_end=self.signal_end,
+                flatten=self.flatten_time,
+            ),
+        )
 
 
 @dataclass(frozen=True)
@@ -81,22 +146,27 @@ class ResearchConfig:
     signal: SignalConfig = field(default_factory=SignalConfig)
     risk: RiskConfig = field(default_factory=RiskConfig)
     prop: PropConfig = field(default_factory=PropConfig)
+    execution: ExecutionConfig = field(default_factory=ExecutionConfig)
 
     @classmethod
     def from_mapping(cls, value: dict[str, Any]) -> "ResearchConfig":
-        allowed = {"instrument", "signal", "risk", "prop"}
+        allowed = {"instrument", "signal", "risk", "prop", "execution"}
         unknown = set(value) - allowed
         if unknown:
             raise ValueError(f"Unknown configuration sections: {sorted(unknown)}")
+        signal_mapping = dict(value.get("signal", {}))
+        raw_sessions = signal_mapping.pop("sessions", ())
+        sessions = tuple(SessionWindowConfig(**item) for item in raw_sessions)
         return cls(
             instrument=InstrumentConfig(**value.get("instrument", {})),
-            signal=SignalConfig(**value.get("signal", {})),
+            signal=SignalConfig(sessions=sessions, **signal_mapping),
             risk=RiskConfig(**value.get("risk", {})),
             prop=PropConfig(**value.get("prop", {})),
+            execution=ExecutionConfig(**value.get("execution", {})),
         )
 
     def validate(self) -> None:
-        i, s, r, p = self.instrument, self.signal, self.risk, self.prop
+        i, s, r, p, e = self.instrument, self.signal, self.risk, self.prop, self.execution
         if i.tick_size <= 0 or i.tick_value <= 0:
             raise ValueError("tick_size and tick_value must be positive")
         if not i.symbol.strip():
@@ -127,6 +197,21 @@ class ResearchConfig:
             raise ValueError("min_l2_persistence must be in [0, 1]")
         if s.max_spread_ticks <= 0 or s.max_l2_age_ms <= 0:
             raise ValueError("L2 spread and freshness bounds must be positive")
+        self._validate_sessions()
+        if e.min_wall_ratio < 1.0:
+            raise ValueError("min_wall_ratio must be at least 1.0")
+        if e.wall_offset_ticks < 1 or e.wall_stop_pad_ticks < 0:
+            raise ValueError("wall offset/pad ticks are invalid")
+        if e.max_wall_chase_ticks < e.wall_offset_ticks:
+            raise ValueError("max_wall_chase_ticks must be at least wall_offset_ticks")
+        if e.wall_entry_timeout_bars < 1:
+            raise ValueError("wall_entry_timeout_bars must be positive")
+        if e.wall_entry_fallback not in {"market", "skip"}:
+            raise ValueError("wall_entry_fallback must be 'market' or 'skip'")
+        if e.round_level_front_ticks < 0 or e.round_level_target_window_ticks < 0:
+            raise ValueError("round-level target parameters are invalid")
+        if e.round_level_stop_trigger_ticks < 0 or e.round_level_stop_pad_ticks < 0:
+            raise ValueError("round-level stop parameters are invalid")
         if r.max_risk_per_trade <= 0 or r.max_contracts < 1:
             raise ValueError("risk budget and max_contracts must be positive")
         if not 1 <= r.min_stop_ticks <= r.max_stop_ticks:
@@ -147,6 +232,49 @@ class ResearchConfig:
             initial_floor = p.initial_balance - p.max_loss
             if not initial_floor < p.locked_floor <= p.initial_balance + p.max_loss:
                 raise ValueError("prop locked_floor is inconsistent with the account profile")
+
+    def _validate_sessions(self) -> None:
+        windows = self.signal.resolved_sessions()
+        names = [window.name.strip() for window in windows]
+        if len(set(names)) != len(names) or any(not name for name in names):
+            raise ValueError("session names must be unique and non-empty")
+        intervals: list[tuple[time, time, str]] = []
+        for window in windows:
+            open_clock = _clock(window.open)
+            signal_end = _clock(window.signal_end)
+            flatten = _clock(window.flatten)
+            if not open_clock < signal_end < flatten:
+                raise ValueError(
+                    f"session {window.name!r}: open, signal_end, and flatten must be increasing"
+                )
+            if not 1 <= window.opening_range_minutes <= 60:
+                raise ValueError(f"session {window.name!r}: opening_range_minutes must be in [1, 60]")
+            if not 0 < window.risk_fraction <= 1:
+                raise ValueError(f"session {window.name!r}: risk_fraction must be in (0, 1]")
+            min_or_atr = window.min_or_atr if window.min_or_atr is not None else self.signal.min_or_atr
+            max_or_atr = window.max_or_atr if window.max_or_atr is not None else self.signal.max_or_atr
+            if not 0 < min_or_atr < max_or_atr:
+                raise ValueError(f"session {window.name!r}: opening-range ATR bounds are invalid")
+            min_or_ticks = window.min_or_ticks if window.min_or_ticks is not None else self.signal.min_or_ticks
+            max_or_ticks = window.max_or_ticks if window.max_or_ticks is not None else self.signal.max_or_ticks
+            if not 1 <= min_or_ticks < max_or_ticks:
+                raise ValueError(f"session {window.name!r}: opening-range tick bounds are invalid")
+            if window.max_spread_ticks is not None and window.max_spread_ticks <= 0:
+                raise ValueError(f"session {window.name!r}: max_spread_ticks must be positive")
+            if window.slippage_ticks_per_side is not None and window.slippage_ticks_per_side < 0:
+                raise ValueError(f"session {window.name!r}: slippage cannot be negative")
+            if (
+                window.min_breakout_relative_volume is not None
+                and window.min_breakout_relative_volume <= 0
+            ):
+                raise ValueError(f"session {window.name!r}: relative-volume floor must be positive")
+            intervals.append((open_clock, flatten, window.name))
+        intervals.sort()
+        for (_, first_end, first_name), (second_start, _, second_name) in zip(intervals, intervals[1:]):
+            if second_start <= first_end:
+                raise ValueError(
+                    f"sessions {first_name!r} and {second_name!r} overlap; windows must be disjoint"
+                )
 
 
 def load_config(path: str | Path) -> ResearchConfig:

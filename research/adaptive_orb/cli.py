@@ -37,6 +37,8 @@ def _backtest(args: argparse.Namespace) -> int:
             output / "trades.csv",
             [
                 "session",
+                "window",
+                "entry_type",
                 "direction",
                 "signal_time",
                 "entry_time",
@@ -64,6 +66,7 @@ def _backtest(args: argparse.Namespace) -> int:
     prop = simulate_eod_trailing_account(result.daily, result.trades, config.prop)
     report = {
         "summary": result.summary,
+        "no_trade_diagnostics_by_window": result.diagnostics,
         "double_cost_stress_summary": stressed_result.summary,
         "probabilistic_sharpe_ratio_vs_zero": psr,
         "moving_block_bootstrap": asdict(bootstrap) if bootstrap else None,

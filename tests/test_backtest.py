@@ -6,7 +6,14 @@ import unittest
 from zoneinfo import ZoneInfo
 
 from adaptive_orb.backtest import _vwap_path, run_backtest
-from adaptive_orb.config import InstrumentConfig, ResearchConfig, RiskConfig, SignalConfig
+from adaptive_orb.config import (
+    ExecutionConfig,
+    InstrumentConfig,
+    ResearchConfig,
+    RiskConfig,
+    SessionWindowConfig,
+    SignalConfig,
+)
 from adaptive_orb.model import Bar
 
 
@@ -163,6 +170,149 @@ class BacktestTests(unittest.TestCase):
         result = run_backtest(_baseline_day() + _long_setup(), costly)
         self.assertEqual(len(result.trades), 1)
         self.assertEqual(result.trades[0].quantity, 1)
+
+    def test_diagnostics_explain_blocked_sessions(self) -> None:
+        result = run_backtest(_baseline_day() + _long_setup(include_l2=False), _config(require_l2=True))
+        self.assertEqual(result.trades, ())
+        self.assertEqual(result.diagnostics["primary"].get("no_confirmed_retest"), 1)
+
+
+def _wall_execution(**overrides: object) -> ExecutionConfig:
+    values: dict[str, object] = {
+        "use_wall_entries": True,
+        "min_wall_ratio": 4.0,
+        "wall_offset_ticks": 2,
+        "wall_stop_pad_ticks": 1,
+        "max_wall_chase_ticks": 10,
+        "wall_entry_timeout_bars": 2,
+        "wall_entry_fallback": "market",
+        "use_round_levels": False,
+    }
+    values.update(overrides)
+    return ExecutionConfig(**values)  # type: ignore[arg-type]
+
+
+def _wall_config(execution: ExecutionConfig) -> ResearchConfig:
+    base = _config()
+    return replace(base, execution=execution)
+
+
+def _wall_setup(signal_bar_wall: float | None, bars_after_signal: list[Bar]) -> list[Bar]:
+    wall_kwargs: dict[str, float] = {}
+    if signal_bar_wall is not None:
+        wall_kwargs = {"bid_wall_price": signal_bar_wall, "bid_wall_ratio": 5.0}
+    return [
+        _bar(2, 9, 30, 100, 102, 100, 101, 100),
+        _bar(2, 9, 31, 101, 103, 101, 102, 100),
+        _bar(2, 9, 32, 102, 104, 102, 103, 100),
+        _bar(2, 9, 33, 103, 106, 103, 106, 240),
+        replace(_bar(2, 9, 34, 106, 106, 104, 105, 150, l2=True), **wall_kwargs),
+        *bars_after_signal,
+        _bar(2, 15, 55, 110, 110, 109, 109, 100),
+    ]
+
+
+class WallEntryTests(unittest.TestCase):
+    def test_wall_limit_fill_uses_offset_price_and_wall_stop(self) -> None:
+        bars = _baseline_day() + _wall_setup(
+            102.0, [_bar(2, 9, 35, 105.5, 111, 103, 110, 150)]
+        )
+        result = run_backtest(bars, _wall_config(_wall_execution()))
+        self.assertEqual(len(result.trades), 1)
+        trade = result.trades[0]
+        self.assertEqual(trade.entry_type, "wall_limit")
+        # Limit rests wall (102) + 2 ticks = 104; fill requires trading through it.
+        self.assertEqual(trade.entry_price, 104.0)
+        # Stop anchors behind the wall: 102 - 1 tick pad = 101 (3 ticks from entry).
+        self.assertEqual(trade.stop_price, 101.0)
+        self.assertEqual(trade.exit_reason, "target")
+
+    def test_wall_limit_timeout_falls_back_to_market(self) -> None:
+        bars = _baseline_day() + _wall_setup(
+            100.0,
+            [
+                _bar(2, 9, 35, 105.5, 111, 104, 110, 150),
+                _bar(2, 9, 36, 110, 112, 108, 111, 150),
+                _bar(2, 9, 37, 111, 112, 110, 111, 150),
+            ],
+        )
+        result = run_backtest(bars, _wall_config(_wall_execution()))
+        self.assertEqual(len(result.trades), 1)
+        trade = result.trades[0]
+        self.assertEqual(trade.entry_type, "wall_fallback_market")
+        self.assertEqual(trade.entry_price, 111.0)
+
+    def test_wall_limit_timeout_can_skip_instead(self) -> None:
+        bars = _baseline_day() + _wall_setup(
+            100.0,
+            [
+                _bar(2, 9, 35, 105.5, 111, 104, 110, 150),
+                _bar(2, 9, 36, 110, 112, 108, 111, 150),
+                _bar(2, 9, 37, 111, 112, 110, 111, 150),
+            ],
+        )
+        result = run_backtest(bars, _wall_config(_wall_execution(wall_entry_fallback="skip")))
+        self.assertEqual(result.trades, ())
+        self.assertEqual(result.diagnostics["primary"].get("wall_limit_timeout_skipped"), 1)
+
+    def test_wall_limit_cancelled_when_thesis_fails_before_fill(self) -> None:
+        bars = _baseline_day() + _wall_setup(
+            102.0, [_bar(2, 9, 35, 105.5, 106, 104, 102, 150)]
+        )
+        result = run_backtest(bars, _wall_config(_wall_execution()))
+        self.assertEqual(result.trades, ())
+        self.assertEqual(result.diagnostics["primary"].get("wall_limit_cancelled"), 1)
+
+    def test_weak_wall_ratio_falls_back_to_plain_market_entry(self) -> None:
+        bars = _baseline_day() + _wall_setup(
+            102.0, [_bar(2, 9, 35, 105.5, 111, 105, 110, 150)]
+        )
+        bars = [
+            replace(bar, bid_wall_ratio=2.0) if bar.bid_wall_ratio is not None else bar
+            for bar in bars
+        ]
+        result = run_backtest(bars, _wall_config(_wall_execution()))
+        self.assertEqual(len(result.trades), 1)
+        self.assertEqual(result.trades[0].entry_type, "market")
+
+
+class GthSessionTests(unittest.TestCase):
+    def _gth_config(self) -> ResearchConfig:
+        base = _config()
+        window = SessionWindowConfig(
+            name="globex_reopen",
+            open="18:00",
+            opening_range_minutes=3,
+            signal_end="19:00",
+            flatten="20:00",
+            risk_fraction=0.5,
+        )
+        return replace(base, signal=replace(base.signal, sessions=(window,)))
+
+    def test_evening_session_trades_and_books_to_next_trade_date(self) -> None:
+        warmup = [
+            _bar(1, 12, 0, 95, 100, 90, 96, 100),
+            _bar(1, 12, 1, 96, 105, 95, 104, 100),
+        ]
+        evening = [
+            _bar(1, 18, 0, 100, 102, 100, 101, 100),
+            _bar(1, 18, 1, 101, 103, 101, 102, 100),
+            _bar(1, 18, 2, 102, 104, 102, 103, 100),
+            _bar(1, 18, 3, 103, 106, 103, 106, 240),
+            _bar(1, 18, 4, 106, 106, 104, 105, 150, l2=True),
+            _bar(1, 18, 5, 105.5, 111, 105, 110, 150),
+            _bar(1, 20, 0, 110, 110, 109, 109, 100),
+        ]
+        result = run_backtest(warmup + evening, self._gth_config())
+        self.assertEqual(len(result.trades), 1)
+        trade = result.trades[0]
+        self.assertEqual(trade.window, "globex_reopen")
+        # 18:00+ belongs to the next trading date (Globex convention).
+        self.assertEqual(trade.session, "2026-01-02")
+        # Half risk fraction halves the size versus the equivalent RTH trade.
+        self.assertEqual(trade.quantity, 1)
+        self.assertEqual(result.daily[-1].session, "2026-01-02")
+        self.assertEqual(result.daily[-1].trades, 1)
 
 
 if __name__ == "__main__":
