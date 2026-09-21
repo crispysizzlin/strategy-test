@@ -4,8 +4,8 @@
 //
 // Default profile: MNQ on a Lucid Pro 100k evaluation. Trades up to three intraday windows
 // per CME trading day (Globex reopen 18:00 ET, London 03:00 ET, New York 09:30 ET), each with
-// its own opening range. Level 2 "walls" only improve execution (passive limit queued in front
-// of large persistent resting orders); they never veto a signal. Round-number levels
+// its own opening range. Defaults use price/volume signals with no Level 2 subscription.
+// Level 2 confirmation and wall execution are optional, separate research modes. Round-number levels
 // (…00/20/40/50/60/80) only adjust exits; they never create signals.
 
 using System;
@@ -117,7 +117,7 @@ namespace Quantower.AdaptiveOrb
         public Account CurrentAccount { get; set; }
 
         [InputParameter("Use Level 2 confirmation", 10)]
-        public bool UseLevel2 { get; set; } = true;
+        public bool UseLevel2 { get; set; } = false;
 
         [InputParameter("Opening range minutes", 11, 5, 60, 5, 0)]
         public int OpeningRangeMinutes { get; set; } = 15;
@@ -240,7 +240,10 @@ namespace Quantower.AdaptiveOrb
         public int Level2FreshnessMilliseconds { get; set; } = 750;
 
         [InputParameter("Use wall-offset limit entries", 44)]
-        public bool UseWallEntries { get; set; } = true;
+        public bool UseWallEntries { get; set; } = false;
+
+        [InputParameter("Maximum L1 quote age milliseconds", 138, 100, 10000, 100, 0)]
+        public int MaximumQuoteAgeMilliseconds { get; set; } = 2000;
 
         [InputParameter("Wall detection depth levels", 45, 5, 30, 1, 0)]
         public int WallDepthLevels { get; set; } = 15;
@@ -427,8 +430,8 @@ namespace Quantower.AdaptiveOrb
 
         public AdaptiveOrbStrategy()
         {
-            this.Name = "Adaptive ORB multi-session + L2 walls + round numbers";
-            this.Description = "Research strategy: cost-aware ORB retest across Globex/London/NY windows with VWAP, Level 2 wall execution, and round-number exits";
+            this.Name = "Adaptive ORB multi-session (price/volume default)";
+            this.Description = "Research strategy: Globex/London/NY ORB retests with VWAP, volume, L1 spread checks, and round-number exits; optional L2";
         }
 
         protected override void OnRun()
@@ -459,9 +462,13 @@ namespace Quantower.AdaptiveOrb
                     return;
                 }
 
-                this.OpenLevel2Writer();
+                if (this.UseLevel2)
+                {
+                    this.OpenLevel2Writer();
+                    this.CurrentSymbol.NewLevel2 += this.CurrentSymbolOnNewLevel2;
+                }
                 this.CurrentSymbol.NewLast += this.CurrentSymbolOnNewLast;
-                this.CurrentSymbol.NewLevel2 += this.CurrentSymbolOnNewLevel2;
+                this.CurrentSymbol.NewQuote += this.CurrentSymbolOnNewQuote;
                 this.CurrentAccount.Updated += this.CurrentAccountOnUpdated;
                 Core.Instance.PositionAdded += this.CoreOnPositionAdded;
                 Core.Instance.PositionRemoved += this.CoreOnPositionRemoved;
@@ -469,6 +476,9 @@ namespace Quantower.AdaptiveOrb
                 Core.Instance.TradeAdded += this.CoreOnTradeAdded;
                 this.watchdog = new Timer(this.WatchdogTick, null, 1000, 1000);
                 this.strategyStarted = true;
+                this.Log(this.UseLevel2
+                    ? "Signal mode: optional L2 confirmation."
+                    : "Signal mode: price/volume; no depth subscription, wall entries, or L2 recording. L1 execution checks remain active.");
                 this.Log("Started. This build is research-only until the repository validation gate passes.");
             }
         }
@@ -484,6 +494,7 @@ namespace Quantower.AdaptiveOrb
                 if (this.CurrentSymbol != null)
                 {
                     this.CurrentSymbol.NewLast -= this.CurrentSymbolOnNewLast;
+                    this.CurrentSymbol.NewQuote -= this.CurrentSymbolOnNewQuote;
                     this.CurrentSymbol.NewLevel2 -= this.CurrentSymbolOnNewLevel2;
                 }
                 if (this.CurrentAccount != null)
@@ -536,6 +547,11 @@ namespace Quantower.AdaptiveOrb
                 this.Log("At least one trading session must be enabled.", StrategyLoggingLevel.Error);
                 return false;
             }
+            if (this.MaximumQuoteAgeMilliseconds <= 0 || this.MaximumSpreadTicks <= 0D || this.GthMaximumSpreadTicks <= 0D)
+            {
+                this.Log("L1 freshness and spread limits must be positive.", StrategyLoggingLevel.Error);
+                return false;
+            }
             if (this.MinimumOpeningRangeAtr <= 0D || this.MaximumOpeningRangeAtr <= this.MinimumOpeningRangeAtr)
             {
                 this.Log("Opening-range ATR bounds are invalid.", StrategyLoggingLevel.Error);
@@ -551,7 +567,7 @@ namespace Quantower.AdaptiveOrb
                 this.Log("Stop bounds are invalid.", StrategyLoggingLevel.Error);
                 return false;
             }
-            if (this.UseWallEntries && this.MaximumWallChaseTicks < this.WallOffsetTicks)
+            if (this.UseLevel2 && this.UseWallEntries && this.MaximumWallChaseTicks < this.WallOffsetTicks)
             {
                 this.Log("Maximum wall chase ticks must be at least the wall offset.", StrategyLoggingLevel.Error);
                 return false;
@@ -575,7 +591,7 @@ namespace Quantower.AdaptiveOrb
                 item => item.ConnectionId == this.CurrentSymbol.ConnectionId && item.Behavior == OrderTypeBehavior.Limit);
             if (limitType == null)
             {
-                if (this.UseWallEntries)
+                if (this.UseLevel2 && this.UseWallEntries)
                 {
                     this.Log("The selected connection does not expose a limit order type; wall entries are unavailable.", StrategyLoggingLevel.Error);
                     return false;
@@ -777,6 +793,12 @@ namespace Quantower.AdaptiveOrb
         // Market data
         // ------------------------------------------------------------------
 
+        private void CurrentSymbolOnNewQuote(Symbol symbol, Quote quote)
+        {
+            // Subscribe to ordinary best bid/ask updates without requesting depth.
+            // Symbol caches the quote and its timestamp; validate it at order time.
+        }
+
         private void CurrentSymbolOnNewLast(Symbol symbol, Last last)
         {
             lock (this.sync)
@@ -819,7 +841,8 @@ namespace Quantower.AdaptiveOrb
                         this.openingRangeLow = Math.Min(this.openingRangeLow, last.Price);
                     }
                 }
-                this.UpdateTradeDelta(last);
+                if (this.UseLevel2)
+                    this.UpdateTradeDelta(last);
             }
         }
 
@@ -1034,7 +1057,7 @@ namespace Quantower.AdaptiveOrb
 
         private void TryEnter(TradingWindow window, Side side, double entryReference, double retestExtreme, DateTime marketTimeEastern)
         {
-            if (!this.PreTradeRiskChecks())
+            if (!this.PreTradeRiskChecks() || !this.Level1ExecutionAllowed(window))
                 return;
             if (this.TryPlaceWallLimitEntry(window, side, entryReference, retestExtreme, marketTimeEastern))
                 return;
@@ -1043,7 +1066,7 @@ namespace Quantower.AdaptiveOrb
 
         private bool TryPlaceWallLimitEntry(TradingWindow window, Side side, double entryReference, double retestExtreme, DateTime marketTimeEastern)
         {
-            if (!this.UseWallEntries || this.limitOrderTypeId == null)
+            if (!this.UseLevel2 || !this.UseWallEntries || this.limitOrderTypeId == null)
                 return false;
             OrderFlowSnapshot snapshot = this.latestOrderFlow;
             if (snapshot == null
@@ -1300,7 +1323,7 @@ namespace Quantower.AdaptiveOrb
             // The wall-limit attempt consumed the window's trade budget; the fallback
             // replaces that same attempt, so the counter is restored before re-entry.
             this.tradesThisWindow = Math.Max(0, this.tradesThisWindow - 1);
-            if (!this.PreTradeRiskChecks())
+            if (!this.PreTradeRiskChecks() || !this.Level1ExecutionAllowed(window))
                 return;
             this.Log(window.Name + ": wall limit timed out; falling back to a market entry.", StrategyLoggingLevel.Trading);
             this.SendMarketEntry(window, side, this.CurrentSymbol.Last, this.wallEntryRetestExtreme, marketTimeEastern);
@@ -1348,6 +1371,8 @@ namespace Quantower.AdaptiveOrb
         {
             lock (this.sync)
             {
+                if (!this.UseLevel2)
+                    return;
                 DateTime wallClock = DateTime.UtcNow;
                 this.lastLevel2WallClockUtc = wallClock;
                 if ((wallClock - this.lastLevel2CalculationWallClockUtc).TotalMilliseconds < 200D)
@@ -1722,6 +1747,24 @@ namespace Quantower.AdaptiveOrb
             if (this.RequireExternalRegime && this.externalDirection == RegimeDirection.None)
                 return false;
             return true;
+        }
+
+        private bool Level1ExecutionAllowed(TradingWindow window)
+        {
+            double bid = this.CurrentSymbol.Bid;
+            double ask = this.CurrentSymbol.Ask;
+            DateTime quoteUtc = this.CurrentSymbol.QuoteDateTime;
+            if (quoteUtc.Kind == DateTimeKind.Unspecified)
+                quoteUtc = DateTime.SpecifyKind(quoteUtc, DateTimeKind.Utc);
+            DateTime now = this.EnableWallClockWatchdog ? DateTime.UtcNow : this.GetMarketUtc();
+            double ageMs = (now - quoteUtc.ToUniversalTime()).TotalMilliseconds;
+            bool valid = bid > 0D && ask > bid
+                && !double.IsInfinity(bid) && !double.IsInfinity(ask)
+                && (ask - bid) / this.CurrentSymbol.TickSize <= window.MaxSpreadTicks
+                && ageMs >= 0D && ageMs <= this.MaximumQuoteAgeMilliseconds;
+            if (!valid)
+                this.Log(window.Name + ": entry skipped; L1 quote missing, stale, crossed, or spread too wide.");
+            return valid;
         }
 
         private void ResetTradingDay(DateTime tradeDateEastern)

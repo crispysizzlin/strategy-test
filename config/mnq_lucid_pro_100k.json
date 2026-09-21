@@ -25,7 +25,7 @@
     "min_breakout_relative_volume": 1.15,
     "vwap_slope_bars": 3,
     "min_vwap_slope_ticks": 2.0,
-    "require_l2": true,
+    "require_l2": false,
     "min_l2_composite": 0.15,
     "min_l2_persistence": 0.60,
     "max_spread_ticks": 2.0,
@@ -72,7 +72,7 @@
     ]
   },
   "execution": {
-    "use_wall_entries": true,
+    "use_wall_entries": false,
     "min_wall_ratio": 4.0,
     "wall_offset_ticks": 6,
     "wall_stop_pad_ticks": 4,

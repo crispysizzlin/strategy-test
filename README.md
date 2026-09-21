@@ -1,10 +1,10 @@
 # Adaptive ORB for Quantower
 
-A cost-aware research implementation of a multi-session opening-range breakout/retest strategy for CME equity-index futures, designed for Quantower with Rithmic Level 2 and prop-firm risk constraints. The default profile targets **MNQ on a Lucid Pro 100k** and trades up to three windows per CME trading day: the Globex reopen (18:00 ET), the London open (03:00 ET), and the New York open (09:30 ET).
+A cost-aware research implementation of a multi-session opening-range breakout/retest strategy for CME equity-index futures, designed for Quantower with price/volume signals and prop-firm risk constraints. Level 2 is optional and disabled by default. The default profile targets **MNQ on a Lucid Pro 100k** and trades up to three windows per CME trading day: the Globex reopen (18:00 ET), the London open (03:00 ET), and the New York open (09:30 ET).
 
 ## Status: research prototype, not a profitability claim
 
-The repository contains an executable Quantower strategy, a reproducible Python simulator, Level 2 feature tooling, prop-account path simulation, and validation gates. It does **not** yet contain the historical Rithmic/CME depth data or untouched live-forward results needed to call the strategy profitable.
+The repository contains an executable Quantower strategy, a reproducible Python simulator, Level 2 feature tooling, prop-account path simulation, and validation gates. It does **not** yet contain historical market data or untouched live-forward results needed to call the strategy profitable. The default no-L2 strategy can be researched with full-session OHLCV; depth is needed only for the optional L2 variant.
 
 | Check | Current status |
 |---|---|
@@ -26,12 +26,13 @@ Simple ORB performance is unstable across instruments and subperiods. The strate
 1. Each enabled window's opening range (default 15 minutes) defines a market-generated level; GTH windows carry their own regime bounds, spread caps, slippage assumptions, and a reduced risk fraction.
 2. OR width versus recent full-day true range, breakout relative volume, and window-anchored VWAP identify a plausible directional regime.
 3. Entry waits for a breakout **and retest**, avoiding the first-touch chase.
-4. Persistent five-level depth imbalance, order-flow imbalance, microprice, and trade delta confirm the retest. A single displayed “wall” is never enough.
+4. The default enters after price/volume confirmation without depth, OFI, microprice, or trade-delta signals. Live entries still require a fresh, valid Level 1 best bid/ask within the session spread cap.
 
-Two execution modifiers are deliberately **not** additional filters, so they cannot silently starve the strategy of trades:
+The default keeps bounded **round-number exits**: nearby targets are shaved in front of …00/20/40/50/60/80 levels, and nearby stops may be padded within the stop cap. This is an unvalidated exit hypothesis, not an established edge.
 
-- **Wall-offset entries.** When a large resting order (adaptively defined as ≥ 4× the median displayed level size, persistent for ~2 seconds) supports the trade, the entry becomes a passive limit resting 6 ticks in front of the wall, with the stop anchored behind the wall. If the limit is untouched within the timeout, the strategy falls back to the ordinary market entry.
-- **Round-number exits.** Targets landing near …00/20/40/50/60/80 levels are shaved a few ticks in front of the level; stops resting near such a level are padded beyond it. Both adjustments are bounded and never create or veto a signal.
+**Level 2 confirmation and wall entries are off by default.** No-L2 mode disables wall execution even if an older saved wall setting is on; the Quantower adapter does not subscribe to depth or record L2 in this mode. Optional wall execution remains available only when L2 is explicitly enabled and is a separate experiment.
+
+See [docs/no-l2-mode.md](docs/no-l2-mode.md) for setup, saved-input migration, data requirements, and validation limits.
 
 The backtester reports `no_trade_diagnostics_by_window` (range rejected, no breakout, no confirmed retest, L2 blocked, and so on) so an over-filtered configuration is visible immediately instead of silently "not executing".
 
@@ -56,20 +57,21 @@ Only Python 3.11+ is required:
 PYTHONPATH=research python3 -m unittest discover -s tests -v
 ```
 
-Run a historical simulation after supplying minute bars enriched with close-of-minute L2 features:
+Run a historical simulation after supplying full-session minute OHLCV bars:
 
 ```bash
 PYTHONPATH=research python3 -m adaptive_orb.cli backtest \
-  --data /path/to/mnq_minute_l2.csv \
+  --data /path/to/mnq_full_session_minutes.csv \
   --config config/mnq_lucid_pro_100k.json \
-  --output artifacts/mnq_oos
+  --no-l2 \
+  --output artifacts/mnq_no_l2
 ```
 
 With GTH sessions enabled, the input must cover the full Globex day; bars at or after 17:00 ET are booked to the next trading date, matching CME's session convention.
 
-The simulator uses next-bar entries, adverse slippage on both sides, published per-side commission, and a pessimistic stop-first rule if both stop and target print within the same minute. Each run automatically repeats with both commission and slippage doubled, and reports a conservative Lucid-style EOD trailing-drawdown path.
+The simulator uses next-bar entries, adverse slippage on both sides, published per-side commission, and a pessimistic stop-first rule if both stop and target print within the same minute. Each run repeats with commission and all effective per-window slippage doubled, and reports a modeled Lucid-style EOD trailing-drawdown path. Stops gapped through fill at the adverse bar open plus adverse slippage. Summary drawdowns use daily closes. Reports include per-window attribution and the effective config; OHLCV does not simulate the live L1 quote guard.
 
-To reduce the Quantower recorder's 200 ms snapshots to decision-time features:
+For the optional L2 experiment only, reduce the Quantower recorder's 200 ms snapshots to decision-time features:
 
 ```bash
 PYTHONPATH=research python3 -m adaptive_orb.cli aggregate-l2 \
@@ -87,8 +89,8 @@ Create a Strategy project with the Quantower Algo extension for Visual Studio 20
 - Enter the **current** prop liquidation threshold from the account dashboard. The strategy deliberately defaults this field to zero and will refuse to start until it is set or enforcement is explicitly disabled for research.
 - With GTH windows enabled, restart once per trading day between the 16:45 ET close-out and the 18:00 ET reopen and refresh that threshold. The live default disables itself on a new trading date (17:00 ET rollover) so yesterday's EOD-trailing floor is not reused.
 - Use MNQ tick value `$0.50` and Lucid's published MNQ commission `$0.50` per contract per side, then stress both higher. GTH windows assume 2 ticks of slippage per side and half risk by default.
-- Keep Level 2 and the wall-clock watchdog enabled in paper/live mode. Disable them only for a clearly labeled bar-only backtest.
-- Wall-offset entries and round-number exits are execution modifiers; each can be disabled independently for ablation tests without touching the signal logic.
+- Set **Use Level 2 confirmation=false** on existing saved instances; new instances default off. Keep the wall-clock watchdog enabled in paper/live mode. No-L2 mode uses trades and ordinary L1 quotes, with a 2-second default maximum quote age for entries.
+- Round-number exits can be disabled for ablation. Wall entries are ignored whenever L2 is disabled; enabling L2 starts a separate strategy variant.
 - Give this strategy exclusive control of the entire selected account. It refuses to start with any existing position or order and shuts down on other-symbol activity.
 - Provider `DAY1` futures bars (full Globex day) now match the research engine's ATR grouping; use `Daily ATR override` only if your provider's boundary still differs.
 - Verify Rithmic attached stop/target behavior — including limit entries with attached protection and partial fills — in simulation before any forward test.
@@ -109,3 +111,4 @@ The code must remain in research/paper mode unless all of these hold on a locked
 - at least 20 untouched Rithmic paper sessions with live slippage and rejection logs.
 
 Passing these tests is evidence of robustness, not a guarantee.
+

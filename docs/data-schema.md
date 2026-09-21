@@ -2,6 +2,8 @@
 
 The research engine accepts UTF-8 CSV with one row per one-minute bar. Timestamps identify the **start** of the minute and must be unique, strictly increasing, and timezone-aware. UTC with a `Z` suffix is preferred.
 
+The default no-L2 MNQ profile needs only OHLCV (plus optional trade_value). All depth, wall, OFI, microprice and trade-delta columns can be omitted; they do not affect no-L2 trades. The live L1 quote guard is not simulated by this OHLCV loader.
+
 ## Minute bars
 
 | Column | Required | Meaning |
@@ -24,7 +26,7 @@ The research engine accepts UTF-8 CSV with one row per one-minute bar. Timestamp
 
 `trade_value` must be populated for every bar in a session or omitted from every bar in that session. When omitted, the engine explicitly reports and uses `(high + low + close) / 3 * volume` as an approximation. Locked validation should use real `trade_value`; the approximation is only for a bar-data baseline.
 
-With `require_l2=true`, all six L2 components plus `l2_age_ms` must be present on a decision bar. The default gate rejects a spread above one tick or book age above 750 ms. Missing or stale depth is a no-trade, and L2 fields must never be forward-filled.
+With `require_l2=true`, all six L2 components plus `l2_age_ms` must be present on a decision bar. The optional L2 gate uses each window's spread cap (MNQ: 2 ticks NY, 3 GTH) and rejects book age above 750 ms. Missing or stale depth is a no-trade, and L2 fields must never be forward-filled.
 
 See `examples/minute_bars_schema.csv` for a syntactic example. Its row is illustrative, not market evidence.
 
@@ -73,3 +75,4 @@ session_date,direction,risk_multiplier,expires_utc
 ```
 
 Allowed directions are `long`, `short`, `both`, or `none`; the multiplier is clamped to `[0, 1]`. This interface is for a slow, independently validated regime source. It is not a substitute for CME depth.
+

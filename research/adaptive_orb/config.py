@@ -59,7 +59,7 @@ class ExecutionConfig:
     (default: market) keeps the base strategy's trade frequency intact.
     """
 
-    use_wall_entries: bool = True
+    use_wall_entries: bool = False
     min_wall_ratio: float = 4.0
     wall_offset_ticks: int = 6
     wall_stop_pad_ticks: int = 4
@@ -93,7 +93,7 @@ class SignalConfig:
     min_breakout_relative_volume: float = 1.15
     vwap_slope_bars: int = 3
     min_vwap_slope_ticks: float = 0.25
-    require_l2: bool = True
+    require_l2: bool = False
     min_l2_composite: float = 0.15
     min_l2_persistence: float = 0.60
     max_spread_ticks: float = 1.0

@@ -230,7 +230,9 @@ class _EntryPlan:
 
 def _supportive_wall(bar: Bar, direction: Direction, config: ResearchConfig) -> tuple[float, float] | None:
     execution = config.execution
-    if not execution.use_wall_entries:
+    # Disabling L2 is a complete depth-independent mode, even with a saved
+    # configuration that still requests wall entries or a CSV containing walls.
+    if not config.signal.require_l2 or not execution.use_wall_entries:
         return None
     if direction is Direction.LONG:
         price, ratio = bar.bid_wall_price, bar.bid_wall_ratio
@@ -406,7 +408,9 @@ def _simulate_trade(
         # Minute bars do not reveal within-bar order. A stop-first convention is the
         # conservative choice when both levels print in the same bar.
         if hit_stop:
-            exit_price = _fill_at_market(stop, direction, False, config, context)
+            # A stop-market cannot fill at the old stop after a gap through it.
+            reference = min(stop, bar.open) if direction is Direction.LONG else max(stop, bar.open)
+            exit_price = _fill_at_market(reference, direction, False, config, context)
             exit_time = bar.timestamp
             exit_reason = "stop"
             break
@@ -471,7 +475,7 @@ def _simulate_trade(
         hold_bars=hold_bars,
         opening_range=width,
         atr=atr,
-        l2_composite=bars[signal_index].l2_composite,
+        l2_composite=bars[signal_index].l2_composite if config.signal.require_l2 else None,
         window=window_name,
         entry_type=plan.entry_type,
     )
