@@ -7,7 +7,7 @@ Before viewing locked results, tag a release containing:
 - instrument and roll rule;
 - opening-range window;
 - exact signal/exit logic;
-- fixed L2 construction;
+- signal mode (default price/volume; fixed L2 construction only for the optional L2 variant);
 - fee and slippage model;
 - parameter neighborhoods to be tested;
 - prop-account profile; and
@@ -22,10 +22,12 @@ Use trade-based MNQ and, separately, NQ data (or MES/ES for the legacy profile) 
 - exchange timestamps and unambiguous UTC conversion;
 - bid/ask and actual trade volume;
 - per-minute sum of trade price times trade size for exact session VWAP;
-- at least top-five depth snapshots or event data at 100–250 ms resolution;
+- only for the optional L2 variant: at least top-five depth snapshots or event data at 100–250 ms resolution;
 - contract identifier on every observation;
 - rejects, fills, and measured slippage for forward tests; and
 - a documented rollover rule based on liquidity, never a back-adjusted price series joined to the wrong contract's order book.
+
+A preliminary no-L2 run accepts OHLCV; exact VWAP reconciliation and the live L1 spread/freshness guard require additional trade/quote records. Missing depth is not a limitation of the no-L2 signal itself.
 
 QuantData may add a dated daily regime field, but it cannot substitute for historical CME depth.
 
@@ -44,10 +46,11 @@ Also report event/regime slices: 2020 shock, 2022 inflation/rate volatility, low
 
 - Decide on bar close, enter at next bar open/first trade.
 - If a minute bar hits stop and target, assume stop first unless tick data resolves order.
+- Stops gapped through fill at the adverse open plus adverse slippage.
 - Charge commission per contract per side.
 - Apply adverse slippage on entry and exit; base case is one tick per side RTH and two ticks GTH, then stress doubled values.
-- The CLI automatically reports a double-commission/double-slippage run; a four-tick and empirical-tail stress remains required for the final report.
-- Include rejected orders, missed entries, partial fills, disconnects, and stale-book shutdowns in forward testing.
+- The CLI automatically reports a double-commission/double-slippage run; additional empirical-tail stress remains required for the final report.
+- Include rejected orders, missed entries, partial fills, disconnects, and stale-feed shutdowns (book shutdowns only in L2 mode) in forward testing.
 - Apply the prop max-loss floor to conservative intraday equity, not merely EOD P&L.
 - Compute payout best-day consistency as best positive day divided by **net cumulative profit**, including losing days in the denominator.
 - Do not count a limit order as filled merely because price touched it. Wall-offset limit entries count as filled only when price trades **strictly through** the limit by at least one tick; queue priority is never assumed. Non-wall entries remain market orders with a server-side bracket.
@@ -105,3 +108,4 @@ Remain in research/paper mode unless all conditions hold:
 10. A separate micro-live/funded risk decision made only after paper results reconcile with the backtest.
 
 The `production_gate` function automates the objective subset. Human review is still required for data lineage, trial count, execution reconciliation, and rule compliance.
+

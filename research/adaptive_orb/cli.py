@@ -5,26 +5,60 @@ from dataclasses import asdict, replace
 import json
 from pathlib import Path
 
-from .backtest import run_backtest
-from .config import load_config
+from .backtest import BacktestResult, _summary, _window_context, run_backtest
+from .config import ResearchConfig, load_config
 from .data import load_bars, write_rows
 from .l2 import aggregate_l2_csv
 from .prop import simulate_eod_trailing_account
+from .model import DailyResult
 from .validation import moving_block_bootstrap, probabilistic_sharpe_ratio
+
+
+def _scale_costs(config: ResearchConfig, multiplier: float) -> ResearchConfig:
+    """Scale global costs AND explicit session slippage overrides."""
+    return replace(
+        config,
+        instrument=replace(
+            config.instrument,
+            commission_per_side=multiplier * config.instrument.commission_per_side,
+            slippage_ticks_per_side=multiplier * config.instrument.slippage_ticks_per_side,
+        ),
+        signal=replace(
+            config.signal,
+            sessions=tuple(
+                replace(window, slippage_ticks_per_side=multiplier * window.slippage_ticks_per_side)
+                if window.slippage_ticks_per_side is not None else window
+                for window in config.signal.sessions
+            ),
+        ),
+    )
+
+
+def _window_summaries(result: BacktestResult, config: ResearchConfig) -> dict[str, dict]:
+    """Attribute the combined run; retain zero-trade days in each window."""
+    summaries = {}
+    for window in config.signal.resolved_sessions():
+        trades = [trade for trade in result.trades if trade.window == window.name]
+        daily = []
+        for day in result.daily:
+            selected = [trade for trade in trades if trade.session == day.session]
+            daily.append(DailyResult(
+                day.session, sum(t.net_pnl for t in selected),
+                sum(t.gross_pnl for t in selected), sum(t.commission for t in selected), len(selected),
+            ))
+        summaries[window.name] = _summary(trades, daily)
+    return summaries
 
 
 def _backtest(args: argparse.Namespace) -> int:
     config = load_config(args.config)
+    if args.no_l2:
+        config = replace(config, signal=replace(config.signal, require_l2=False))
+    if not config.signal.require_l2:
+        config = replace(config, execution=replace(config.execution, use_wall_entries=False))
     bars = load_bars(args.data, args.assumed_timezone)
     result = run_backtest(bars, config)
-    stressed_config = replace(
-        config,
-        instrument=replace(
-            config.instrument,
-            commission_per_side=2.0 * config.instrument.commission_per_side,
-            slippage_ticks_per_side=2.0 * config.instrument.slippage_ticks_per_side,
-        ),
-    )
+    stressed_config = _scale_costs(config, 2.0)
     stressed_result = run_backtest(bars, stressed_config)
     output = Path(args.output)
     output.mkdir(parents=True, exist_ok=True)
@@ -66,8 +100,11 @@ def _backtest(args: argparse.Namespace) -> int:
     prop = simulate_eod_trailing_account(result.daily, result.trades, config.prop)
     report = {
         "summary": result.summary,
+        "summary_by_window": _window_summaries(result, config),
         "no_trade_diagnostics_by_window": result.diagnostics,
         "double_cost_stress_summary": stressed_result.summary,
+        "double_cost_stress_by_window": _window_summaries(stressed_result, stressed_config),
+        "effective_config": asdict(config),
         "probabilistic_sharpe_ratio_vs_zero": psr,
         "moving_block_bootstrap": asdict(bootstrap) if bootstrap else None,
         "prop_evaluation_simulation": asdict(prop),
@@ -77,6 +114,19 @@ def _backtest(args: argparse.Namespace) -> int:
             "commission_per_side": config.instrument.commission_per_side,
             "slippage_ticks_per_side": config.instrument.slippage_ticks_per_side,
             "l2_required": config.signal.require_l2,
+            "wall_entries_enabled": config.signal.require_l2 and config.execution.use_wall_entries,
+            "signal_mode": "l2_confirmation" if config.signal.require_l2 else "price_volume",
+            "live_l1_spread_guard_simulated": False,
+            "drawdown_sampling": "end_of_day",
+            "window_summaries": "attribution_of_combined_run_with_shared_daily_lockout",
+            "effective_slippage_ticks_per_side_by_window": {
+                window.name: _window_context(window, config).slippage_ticks_per_side
+                for window in config.signal.resolved_sessions()
+            },
+            "stress_slippage_ticks_per_side_by_window": {
+                window.name: _window_context(window, stressed_config).slippage_ticks_per_side
+                for window in stressed_config.signal.resolved_sessions()
+            },
             "vwap_source": (
                 "sum_trade_price_times_size"
                 if bars and all(bar.trade_value is not None for bar in bars)
@@ -97,6 +147,7 @@ def build_parser() -> argparse.ArgumentParser:
     backtest = subparsers.add_parser("backtest", help="Run a cost-aware historical simulation")
     backtest.add_argument("--data", required=True, help="Minute-bar CSV, optionally enriched with L2 features")
     backtest.add_argument("--config", required=True, help="Research JSON configuration")
+    backtest.add_argument("--no-l2", action="store_true", help="Use price/volume signals and disable all wall entries")
     backtest.add_argument("--output", default="artifacts/latest", help="Output directory")
     backtest.add_argument("--assumed-timezone", default="UTC", help="Timezone for naive input timestamps")
     backtest.add_argument("--bootstrap-simulations", type=int, default=2_000)
